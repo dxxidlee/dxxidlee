@@ -21,7 +21,7 @@ const { p, next } = Astro.props;
     {p.live && <div><dt class="mute">Live</dt><dd><a href={p.live} target="_blank" rel="noopener">Visit site</a></dd></div>}
   </dl>
 
-  <div class="hero"><Media media={p.cover} ratio="l" /></div>
+  <div class="hero-media"><Media media={p.cover} ratio="l" /></div>
   <div class="txt-block grid"><p>{p.intro}</p></div>
 
   {p.blocks.map((b) => {

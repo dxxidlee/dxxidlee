@@ -13,4 +13,13 @@ export const site = {
     { label: 'Instagram', href: 'https://www.instagram.com/dxxidlee/' },
   ],
   location: 'New York',
+  experience: [
+    { org: 'McCann New York', role: 'Design Intern', dates: '[dates]' },
+    { org: 'The Metropolitan Museum of Art, The Costume Institute', role: 'Intern', dates: '[dates]' },
+    { org: 'Studio Betty Wang', role: 'Intern', dates: '[dates]' },
+    { org: 'Hard Sun', role: 'Intern', dates: '[dates]' },
+  ],
+  education: [
+    { org: 'Parsons School of Design', role: 'BFA Communication Design', dates: '2027' },
+  ],
 };

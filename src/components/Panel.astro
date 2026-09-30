@@ -1,0 +1,16 @@
+---
+import { site } from '../data/site.js';
+const path = Astro.url.pathname;
+const onWork = path === '/' || path.startsWith('/work');
+---
+<nav class="panel" aria-label="Primary">
+  <a class="pi full" href="/">{site.name}</a>
+  <div class="prow">
+    <a class="pi" href="/#work" aria-current={onWork ? 'page' : undefined}>Work</a>
+    <a class="pi" href="/info" aria-current={path.startsWith('/info') ? 'page' : undefined}>Info</a>
+  </div>
+  <div class="prow b">
+    <a class="pi circ" href={`mailto:${site.email}`} aria-label={`Email ${site.email}`}>@</a>
+    <a class="pi sq" href={site.resume} target="_blank">Resume</a>
+  </div>
+</nav>
