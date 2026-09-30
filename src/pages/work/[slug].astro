@@ -1,0 +1,45 @@
+---
+import Base from '../../layouts/Base.astro';
+import Media from '../../components/Media.astro';
+import { visible } from '../../data/projects.js';
+
+export function getStaticPaths() {
+  return visible.map((p, i) => ({ params: { slug: p.slug }, props: { p, next: visible[(i + 1) % visible.length] } }));
+}
+const { p, next } = Astro.props;
+---
+<Base title={`${p.title}, David Lee`} description={p.line}>
+  <a class="back mute" href="/">Back to work</a>
+  <h1 class="pj-title">{p.title}</h1>
+  <p class="pj-line">{p.line}</p>
+
+  <dl class="meta">
+    <div><dt class="mute">Year</dt><dd>{p.year}</dd></div>
+    <div><dt class="mute">Role</dt><dd>{p.role}</dd></div>
+    <div><dt class="mute">Deliverables</dt><dd>{p.tags}</dd></div>
+    <div><dt class="mute">Tools</dt><dd>{p.tools}</dd></div>
+    {p.live && <div><dt class="mute">Live</dt><dd><a href={p.live} target="_blank" rel="noopener">Visit site</a></dd></div>}
+  </dl>
+
+  <div class="hero"><Media media={p.cover} ratio="l" /></div>
+  <div class="txt-block grid"><p>{p.intro}</p></div>
+
+  {p.blocks.map((b) => {
+    if (b.type === 'text') return <div class="txt-block tight grid"><p>{b.body}</p></div>;
+    if (b.type === 'embed') return (
+      <figure class="blk"><div class="embed"><iframe src={b.url} title={p.title} loading="lazy" allowfullscreen></iframe></div>
+        {b.caption && <figcaption class="fcap mute">{b.caption}</figcaption>}</figure>);
+    if (b.type === 'pair') return (
+      <figure class="blk pair grid">
+        <div class="a"><Media media={b.a} ratio="l" />{b.caption && <figcaption class="fcap mute">{b.caption}</figcaption>}</div>
+        <div class="b"><Media media={b.b} ratio="p" /></div>
+      </figure>);
+    return (
+      <figure class="blk"><Media media={b.media} ratio={b.ratio || 'l'} />
+        {b.caption && <figcaption class="fcap mute">{b.caption}</figcaption>}</figure>);
+  })}
+
+  {next.slug !== p.slug && (
+    <div class="next"><span class="mute">Next</span><a href={`/work/${next.slug}`}>{next.title}</a></div>
+  )}
+</Base>

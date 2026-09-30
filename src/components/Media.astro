@@ -1,0 +1,11 @@
+---
+// Renders a placeholder, a looping video, or an image depending on media.src
+const { media, ratio = 'l', class: cls = '' } = Astro.props;
+const src = media?.src;
+const isVideo = src && /\.(mp4|webm|mov)$/i.test(src);
+---
+<div class={`slot ${ratio} ${cls}`}>
+  {!src && <span class="lbl">{media?.label}</span>}
+  {isVideo && <video src={src} muted loop playsinline preload="metadata" data-autoplay aria-label={media.label}></video>}
+  {src && !isVideo && <img src={src} alt={media.label} loading="lazy" decoding="async" />}
+</div>
