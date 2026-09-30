@@ -1,8 +1,11 @@
 ---
 import '../styles/global.css';
-import Panel from '../components/Panel.astro';
+import '../styles/system.css';
 import { site } from '../data/site.js';
-const { title = site.title, description = site.description, footer = true, bare = false } = Astro.props;
+import { pad, rows } from '../lib/work.js';
+// nav: which header link is current ('work' or 'info'). Pages can replace the header's right side via slot="right".
+const { title = site.title, description = site.description, nav } = Astro.props;
+const onHome = Astro.url.pathname === '/';
 ---
 <!doctype html>
 <html lang="en">
@@ -18,17 +21,29 @@ const { title = site.title, description = site.description, footer = true, bare 
   <link rel="icon" href="/favicon.svg" />
 </head>
 <body>
-  {!bare && <Panel />}
-  <main class={bare ? undefined : 'wrap'}>
-    <slot />
-  </main>
-  {footer && !bare && (
-    <footer class="wrap foot">
-      <a class="pill" href={`mailto:${site.email}`}>{site.email}</a>
-      {site.links.map((l) => <a class="pill" href={l.href} target="_blank" rel="noopener">{l.label}</a>)}
-      <span class="pill mute">{site.location}</span>
-    </footer>
-  )}
+  <div class="vw">
+    <header class="vw-top">
+      <a class="vw-logo" href="/">{site.name}</a>
+      <div class="vw-right">
+        <slot name="right">
+          <nav class="seg" aria-label="Site">
+            <a href="/" aria-current={nav === 'work' ? 'true' : undefined}>Work</a>
+            <a href="/info" aria-current={nav === 'info' ? 'page' : undefined}>Info</a>
+          </nav>
+          <a class="chip" href={onHome ? '#all' : '/#all'}><span>Index</span><span>{pad(rows.length)}</span></a>
+        </slot>
+      </div>
+    </header>
+
+    <main class="vw-in">
+      <slot />
+    </main>
+
+    <div class="vw-bottom">
+      <a class="chip" href={`mailto:${site.email}`}><span>Email</span><span>{site.email}</span></a>
+      <p class="bar"><span class="avail">{site.status[2]}</span><span><a href={site.resume} target="_blank">Resume</a>&nbsp;&nbsp;<a href="/info">Info</a></span></p>
+    </div>
+  </div>
   <script>
     // Loops play only while visible; respects reduced motion.
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
