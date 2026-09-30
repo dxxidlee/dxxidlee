@@ -1,46 +1,96 @@
 ---
+// One template for every project. Every media block lands on whole units of the square grid:
+// 16:10 is 24 x 15 or 16 x 10, 4:5 is 8 x 10, 16:9 is 16 x 9.
 import Base from '../../layouts/Base.astro';
 import Media from '../../components/Media.astro';
+import Module from '../../components/Module.astro';
 import { visible } from '../../data/projects.js';
+import { site } from '../../data/site.js';
+import { pad, A, layouts, glyphs, spec } from '../../lib/work.js';
 
 export function getStaticPaths() {
-  return visible.map((p, i) => ({ params: { slug: p.slug }, props: { p, next: visible[(i + 1) % visible.length] } }));
+  return visible.map((p, i) => ({ params: { slug: p.slug }, props: { p, i } }));
 }
-const { p, next } = Astro.props;
-import { site } from '../../data/site.js';
+const { p, i } = Astro.props;
+const j = (i + 1) % visible.length;
+const next = visible[j];
+
+// Each block becomes its cells on the grid plus where its caption sits.
+let fig = 0;
+const blocks = p.blocks.map((b) => {
+  if (b.type === 'text') return { text: b.body };
+  fig += 1;
+  if (b.type === 'pair') return { fig, caption: b.caption, cap: A(1, 16, 11, 1),
+    cells: [{ media: b.a, ratio: 'l', a: A(1, 16, 1, 10) }, { media: b.b, ratio: 'p', a: A(17, 8, 1, 10) }] };
+  if (b.type === 'embed') return { fig, caption: b.caption, cap: A(17, 8, 1, 1), cells: [{ embed: b.url, a: A(1, 16, 1, 9) }] };
+  const ratio = b.ratio || 'l';
+  if (ratio === 'w') return { fig, caption: b.caption, cap: A(17, 8, 1, 1), cells: [{ media: b.media, ratio, a: A(1, 16, 1, 9) }] };
+  if (ratio === 'p') return { fig, caption: b.caption, cap: A(9, 8, 1, 1), cells: [{ media: b.media, ratio, a: A(1, 8, 1, 10) }] };
+  return { fig, caption: b.caption, cap: A(1, 16, 16, 1), cells: [{ media: b.media, ratio, a: A(1, 24, 1, 15) }] };
+});
 ---
-<Base title={`${p.title}, ${site.name}`} description={p.line}>
-  <a class="back mute" href="/">Back to work</a>
-  <h1 class="pj-title">{p.title}</h1>
-  <p class="pj-line">{p.line}</p>
+<Base title={`${p.title}, ${site.name}`} description={p.line} nav="work">
+  <section class="g24 intro">
+    <div class="cell i-text" style={`--a:${A(1, 16, 1, 4)}`}>
+      <p class="bar"><span><span class="no">{pad(i + 1)}</span>Case study</span><span>{p.tags}</span></p>
+      <h1><span class="nm">{p.title}</span> {p.line}</h1>
+    </div>
+    <div class="cell i-side" style={`--a:${A(19, 6, 1, 4)}`}>
+      <p class="bar"><span>Details</span><span>{pad(i + 1)} / {pad(visible.length)}</span></p>
+      <dl class="kv">{spec(p).map(([k, v]) => <><dt>{k}</dt><dd>{v}</dd></>)}</dl>
+      {p.live && <a class="bar go" href={p.live} target="_blank" rel="noopener"><span>Visit live site</span><span>+</span></a>}
+    </div>
+  </section>
 
-  <dl class="meta">
-    <div><dt class="mute">Year</dt><dd>{p.year}</dd></div>
-    <div><dt class="mute">Role</dt><dd>{p.role}</dd></div>
-    <div><dt class="mute">Deliverables</dt><dd>{p.tags}</dd></div>
-    <div><dt class="mute">Tools</dt><dd>{p.tools}</dd></div>
-    {p.live && <div><dt class="mute">Live</dt><dd><a href={p.live} target="_blank" rel="noopener">Visit site</a></dd></div>}
-  </dl>
+  <section class="g24 pj">
+    <div class="cell" style={`--a:${A(1, 24, 1, 15)}`}><Media media={p.cover} ratio="l" /></div>
+  </section>
 
-  <div class="hero-media"><Media media={p.cover} ratio="l" /></div>
-  <div class="txt-block grid"><p>{p.intro}</p></div>
+  <section class="g24 pj-txt"><p class="pj-lede">{p.intro}</p></section>
 
-  {p.blocks.map((b) => {
-    if (b.type === 'text') return <div class="txt-block tight grid"><p>{b.body}</p></div>;
-    if (b.type === 'embed') return (
-      <figure class="blk"><div class="embed"><iframe src={b.url} title={p.title} loading="lazy" allowfullscreen></iframe></div>
-        {b.caption && <figcaption class="fcap mute">{b.caption}</figcaption>}</figure>);
-    if (b.type === 'pair') return (
-      <figure class="blk pair grid">
-        <div class="a"><Media media={b.a} ratio="l" />{b.caption && <figcaption class="fcap mute">{b.caption}</figcaption>}</div>
-        <div class="b"><Media media={b.b} ratio="p" /></div>
-      </figure>);
-    return (
-      <figure class="blk"><Media media={b.media} ratio={b.ratio || 'l'} />
-        {b.caption && <figcaption class="fcap mute">{b.caption}</figcaption>}</figure>);
-  })}
+  {blocks.map((b) => b.text ? (
+    <section class="g24 pj-txt"><p class="pj-note">{b.text}</p></section>
+  ) : (
+    <figure class="g24 pj">
+      {b.cells.map((c) => (
+        <div class="cell" style={`--a:${c.a}`}>
+          {c.embed
+            ? <div class="pj-embed"><iframe src={c.embed} title={p.title} loading="lazy" allowfullscreen></iframe></div>
+            : <Media media={c.media} ratio={c.ratio} />}
+        </div>
+      ))}
+      {b.caption && <figcaption class="cell pj-cap" style={`--a:${b.cap}`}><span class="dim">Fig. {String(b.fig).padStart(2, '0')}</span><span>{b.caption}</span></figcaption>}
+    </figure>
+  ))}
 
   {next.slug !== p.slug && (
-    <div class="next"><span class="mute">Next</span><a href={`/work/${next.slug}`}>{next.title}</a></div>
+    <>
+      <section class="g24 pj-next"><p class="cell bar" style={`--a:${A(1, 24, 1, 1)}`}><span>Next project</span><span>{pad(j + 1)} / {pad(visible.length)}</span></p></section>
+      <Module p={next} n={j + 1} L={layouts[j % layouts.length]} glyph={glyphs[j % glyphs.length]} />
+    </>
   )}
 </Base>
+
+<style is:global>
+  /* one empty unit between blocks keeps every block on the same lattice */
+  .pj,.pj-txt{margin:0 0 calc(var(--u) + 2 * var(--gap));}
+  .i-side .go{margin-top:auto;}
+  .pj-txt{grid-auto-rows:auto;}
+  .pj-txt p{grid-column:7 / span 12;}
+  .pj-lede{font-size:18px;line-height:1.2;letter-spacing:-.015em;font-weight:300;padding:0 7px;max-width:52ch;}
+  .pj-note{border-top:1px solid var(--ink);padding:5px 7px;}
+  .pj-cap{display:grid;grid-template-columns:48px 1fr;gap:10px;align-self:start;border-top:1px solid var(--ink);padding:5px 7px;}
+  .pj-embed{position:relative;height:100%;background:var(--ph);}
+  .pj-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+  .pj-next{margin-bottom:var(--gap);}
+  .pj-next .bar{align-self:start;}
+  @container (max-width:980px){ .pj-txt p{grid-column:4 / span 18;} }
+
+  @media (max-width:760px){
+    .pj,.pj-txt{margin-bottom:32px;}
+    .pj .cell .slot{height:auto;}
+    .pj .slot.l{aspect-ratio:16/10;} .pj .slot.w{aspect-ratio:16/9;} .pj .slot.p{aspect-ratio:4/5;}
+    .pj-embed{aspect-ratio:16/9;height:auto;}
+    .pj-next{margin-bottom:var(--gap);}
+  }
+</style>
