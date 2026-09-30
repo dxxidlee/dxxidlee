@@ -7,8 +7,9 @@ export function getStaticPaths() {
   return visible.map((p, i) => ({ params: { slug: p.slug }, props: { p, next: visible[(i + 1) % visible.length] } }));
 }
 const { p, next } = Astro.props;
+import { site } from '../../data/site.js';
 ---
-<Base title={`${p.title}, David Lee`} description={p.line}>
+<Base title={`${p.title}, ${site.name}`} description={p.line}>
   <a class="back mute" href="/">Back to work</a>
   <h1 class="pj-title">{p.title}</h1>
   <p class="pj-line">{p.line}</p>

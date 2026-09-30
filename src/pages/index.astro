@@ -17,7 +17,7 @@ const CAP = 0.75;
 
 const tiles = [
   ...visible.map((p, i) => ({ kind: 'project', p, n: String(i + 1).padStart(2, '0') })),
-  { kind: 'experience', est: 2.65 },
+  { kind: 'experience', est: 3.4 },
   ...inProgress.map((w) => {
     const img = !!(w.image && (w.image.src || showDrafts));
     return { kind: 'wip', w, img, est: 0.75 };
@@ -72,7 +72,7 @@ tiles.forEach((t, order) => {
               <ul class="list">
                 {index.map((r) => (
                   <li>
-                    <span>{r.href ? <a href={r.href} target="_blank" rel="noopener">{r.title} ↗</a> : r.title}</span>
+                    <span>{r.href ? <a href={r.href} target="_blank" rel="noopener">{r.title}<svg class="ext" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 8 8 2M3 2h5v5" fill="none" stroke="currentColor" stroke-width="1.2" /></svg></a> : r.title}</span>
                     <span class="yr">{r.year}</span>
                     <span class="sub">{r.type}</span>
                   </li>
