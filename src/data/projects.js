@@ -172,5 +172,5 @@ export const index = [
   { title: '0316', type: 'Zine', year: '2025' },
 ];
 
-const showDrafts = import.meta.env.DEV || import.meta.env.PUBLIC_SHOW_DRAFTS === 'true';
+export const showDrafts = import.meta.env.DEV || import.meta.env.PUBLIC_SHOW_DRAFTS === 'true';
 export const visible = projects.filter((p) => p.status === 'live' || showDrafts);

@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import Media from '../components/Media.astro';
 import { site } from '../data/site.js';
-import { visible, inProgress, index } from '../data/projects.js';
+import { visible, inProgress, index, showDrafts } from '../data/projects.js';
 ---
 <Base>
   <div class="mark">
@@ -14,7 +14,7 @@ import { visible, inProgress, index } from '../data/projects.js';
     <p class="status mute">{site.status.map((s) => <>{s}<br /></>)}</p>
   </section>
 
-  <div class="sec"><span>Selected work</span><span class="mute">2025 to now</span></div>
+  {visible.length > 0 && <div class="sec"><span>Selected work</span><span class="mute">2025 to now</span></div>}
 
   {visible.map((p, i) => (
     <a class={`row grid ${i % 2 ? 'flip' : ''}`} href={`/work/${p.slug}`}>
@@ -33,8 +33,8 @@ import { visible, inProgress, index } from '../data/projects.js';
   <div class="sec"><span>In progress</span><span class="mute">Shown when finished</span></div>
   <section class="wip grid">
     {inProgress.map((w) => (
-      <div class={w.image ? '' : 'txt'}>
-        {w.image && <Media media={w.image} ratio="p" />}
+      <div class={w.image && (w.image.src || showDrafts) ? '' : 'txt'}>
+        {w.image && (w.image.src || showDrafts) && <Media media={w.image} ratio="p" />}
         <p>{w.title} <span class="mute">{w.meta}</span></p>
         <p class="mute">{w.line}</p>
       </div>
