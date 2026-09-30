@@ -2,7 +2,7 @@
 import '../styles/global.css';
 import Panel from '../components/Panel.astro';
 import { site } from '../data/site.js';
-const { title = site.title, description = site.description, footer = true } = Astro.props;
+const { title = site.title, description = site.description, footer = true, bare = false } = Astro.props;
 ---
 <!doctype html>
 <html lang="en">
@@ -18,11 +18,11 @@ const { title = site.title, description = site.description, footer = true } = As
   <link rel="icon" href="/favicon.svg" />
 </head>
 <body>
-  <Panel />
-  <main class="wrap">
+  {!bare && <Panel />}
+  <main class={bare ? undefined : 'wrap'}>
     <slot />
   </main>
-  {footer && (
+  {footer && !bare && (
     <footer class="wrap foot">
       <a class="pill" href={`mailto:${site.email}`}>{site.email}</a>
       {site.links.map((l) => <a class="pill" href={l.href} target="_blank" rel="noopener">{l.label}</a>)}

@@ -1,98 +1,375 @@
 ---
+// Homepage: two views of the same work in one system. Expanded is a collage on a square unit grid;
+// Grid shows one cover per project, everything at once.
 import Base from '../layouts/Base.astro';
-import Tile from '../components/Tile.astro';
+import Media from '../components/Media.astro';
+import Glyph from '../components/Glyph.astro';
 import { site } from '../data/site.js';
 import { visible, inProgress, index, showDrafts } from '../data/projects.js';
 
-// Desktop collage: columns on a 12-track grid. `media` is the thumbnail ratio projects use in that column;
-// null means text tiles only. Tiles go to the shortest allowed column, like a masonry built at compile time.
-const cols = [
-  { span: 3, media: 'p' },
-  { span: 5, media: 'l' },
-  { span: 2, media: null },
-  { span: 2, media: 'l' },
-];
-const RATIO = { l: 10 / 16, p: 5 / 4 };
-const CAP = 0.75;
+const pad = (n) => String(n).padStart(3, '0');
+const thumbs = (p) => p.blocks
+  .flatMap((b) => (b.type === 'pair' ? [b.a, b.b] : b.media ? [b.media] : []))
+  .slice(0, 3);
+const spec = (p) => [['Year', p.year], ['Role', p.role], ['Deliverables', p.tags], ['Tools', p.tools]];
 
-const tiles = [
-  ...visible.map((p, i) => ({ kind: 'project', p, n: String(i + 1).padStart(2, '0') })),
-  { kind: 'experience', est: 3.4 },
-  ...inProgress.map((w) => {
-    const img = !!(w.image && (w.image.src || showDrafts));
-    return { kind: 'wip', w, img, est: 0.75 };
-  }),
-  { kind: 'index', est: 2.4 },
-  { kind: 'contact', est: 1.6 },
+// Grid area on the 24-column square-unit grid: column, column span, row, row span.
+// Every cell starts and ends on a unit line, so neighbouring edges always meet exactly.
+const A = (c, cs, r, rs) => `${r} / ${c} / span ${rs} / span ${cs}`;
+const T = (c, r) => A(c, 3, r, 2);
+const layouts = [
+  { cover: A(1, 13, 1, 8), info: A(14, 6, 1, 8), port: A(20, 5, 3, 6), thumbs: [T(5, 9), T(8, 9), T(11, 9)], glyph: A(21, 4, 10, 4) },
+  { port: A(1, 5, 1, 6), info: A(6, 6, 3, 8), cover: A(12, 13, 3, 8), thumbs: [T(12, 11), T(15, 11), T(18, 11)], glyph: A(2, 4, 8, 4) },
+  { glyph: A(2, 3, 1, 3), info: A(1, 6, 4, 8), cover: A(7, 18, 1, 11), thumbs: [T(16, 12), T(19, 12), T(22, 12)], port: A(7, 4, 12, 5) },
+  { info: A(1, 6, 1, 8), port: A(7, 5, 1, 6), cover: A(12, 13, 1, 8), thumbs: [T(12, 9), T(15, 9), T(18, 9)], glyph: A(8, 4, 8, 4) },
 ];
+const glyphs = ['eye', 'loop', 'plus', 'mark'];
 
-const heights = cols.map(() => 0);
-const placed = cols.map(() => []);
-tiles.forEach((t, order) => {
-  const allowed = t.kind === 'project' ? [1, 0, 3] : t.kind === 'index' ? [1] : [2, 3];
-  const c = allowed.reduce((a, b) => (heights[b] < heights[a] - 0.01 ? b : a));
-  const ratio = t.kind === 'project' ? cols[c].media : t.img ? 'p' : null;
-  heights[c] += ratio ? cols[c].span * RATIO[ratio] + CAP : t.est;
-  placed[c].push({ ...t, ratio, order });
+const lastYear = (y) => Math.max(0, ...(String(y).match(/\d{4}/g) || []).map(Number));
+const rows = [
+  ...visible.map((p) => ({ title: p.title, type: p.tags, year: p.year, role: p.role, href: `/work/${p.slug}`, label: 'Case study' })),
+  ...index.map((r) => ({ title: r.title, type: r.type, year: r.year, role: '', href: r.href, label: r.href ? 'Visit' : '' })),
+].sort((a, b) => lastYear(b.year) - lastYear(a.year));
+
+const people = [...site.experience, ...site.education];
+const shortDate = (d) => (/present/i.test(d) ? 'Now' : (d.match(/\d{4}/g) || ['']).pop());
+
+// Grid view order: projects with the text tiles woven in, like one sheet of everything.
+const gridTiles = [];
+visible.forEach((p, i) => {
+  gridTiles.push({ kind: 'project', p, n: i + 1 });
+  if (i === 2) gridTiles.push({ kind: 'experience' });
+  if (i === 5 && inProgress[0]) gridTiles.push({ kind: 'wip', w: inProgress[0] });
 });
----
-<Base footer={false}>
-  <section class="hero">
-    <h1>
-      {site.wordmark ? <img class="wordmark" src={site.wordmark} alt={site.name} /> : <span class="nm">{site.name}</span>}
-      <span class="ps">{site.positioning}</span>
-    </h1>
-    <ul class="status">{site.status.map((s) => <li class="pill">{s}</li>)}</ul>
-  </section>
+if (visible.length < 3) gridTiles.push({ kind: 'experience' });
+inProgress.slice(visible.length < 6 ? 0 : 1).forEach((w) => gridTiles.push({ kind: 'wip', w }));
+gridTiles.push({ kind: 'contact' }, { kind: 'index' });
 
-  <div class="collage" id="work">
-    {placed.map((list, c) => (
-      <div class="ccol" style={`--span:${cols[c].span}`}>
-        {list.map((t) => {
-          if (t.kind === 'project') return (
-            <Tile href={`/work/${t.p.slug}`} n={t.n} title={t.p.title} meta={t.p.year} line={t.p.line}
-              media={t.ratio === 'p' ? t.p.portrait : t.p.cover} ratio={t.ratio} order={t.order} />
-          );
-          if (t.kind === 'wip') return (
-            <Tile title={t.w.title} meta={t.w.meta} line={t.w.line} media={t.img ? t.w.image : null} ratio="p" order={t.order} />
-          );
-          if (t.kind === 'experience') return (
-            <section class="tile txt" style={`order:${t.order}`}>
-              <h2 class="pill">Experience</h2>
-              <ul class="list">
-                {[...site.experience, ...site.education].map((e) => (
-                  <li><span>{e.org}</span><span class="sub">{e.role}, {e.dates}</span></li>
+// Expanded view: the experience and in-progress interlude follows the second project.
+const sequence = visible.map((p, i) => ({ p, i }));
+sequence.splice(Math.min(2, visible.length), 0, { inter: true });
+
+// Mosaic: grid view tiles in mixed sizes that tile a 24 x 12 unit block with no holes.
+// Set MOSAIC to false to go back to equal tiles. It only switches on when every tile has a slot.
+const mosaic = {
+  p1: A(1, 10, 1, 8), p5: A(1, 6, 9, 4), p6: A(7, 4, 9, 4),
+  p2: A(11, 5, 1, 6), wip1: A(11, 5, 7, 2), wip0: A(11, 5, 9, 4),
+  experience: A(16, 5, 1, 5), p7: A(16, 5, 6, 4), contact: A(16, 5, 10, 3),
+  p3: A(21, 4, 1, 4), p4: A(21, 4, 5, 4), index: A(21, 4, 9, 4),
+};
+const tileKey = (t) => (t.kind === 'project' ? `p${t.n}` : t.kind === 'wip' ? `wip${inProgress.indexOf(t.w)}` : t.kind);
+const MOSAIC = true && gridTiles.length === Object.keys(mosaic).length && gridTiles.every((t) => mosaic[tileKey(t)]);
+const tileStyle = (t) => (MOSAIC && mosaic[tileKey(t)] ? `--a:${mosaic[tileKey(t)]}` : undefined);
+---
+<Base bare>
+  <div class="vw" data-view="auto">
+    <script is:inline>document.currentScript.parentElement.dataset.view = localStorage.getItem('dx-view') || 'auto';</script>
+
+    <header class="vw-top">
+      <a class="vw-logo" href="/">{site.name}</a>
+      <div class="vw-right">
+        <div class="seg" role="group" aria-label="View">
+          <button type="button" data-v="expanded">Expanded</button>
+          <button type="button" data-v="grid">Grid</button>
+        </div>
+        <a class="chip" href="#all"><span>Index</span><span>{pad(rows.length)}</span></a>
+      </div>
+    </header>
+
+    <div class="vw-in">
+      <section class="g24 intro">
+        <div class="cell i-text" style={`--a:${A(1, 16, 1, 4)}`}>
+          <p class="bar"><span>{site.name}</span><span>{site.location}</span></p>
+          <h1><span class="nm">{site.name}</span> {site.positioning}</h1>
+          <ul class="kv-list">{site.status.map((s) => <li>{s}</li>)}</ul>
+        </div>
+        <nav class="cell i-toc" style={`--a:${A(19, 6, 1, 4)}`} aria-label="Contents">
+          <p class="bar"><span>Contents</span><span>{pad(visible.length)}</span></p>
+          <ol>{visible.map((p, i) => <li><a href={`#p-${p.slug}`}><span>{pad(i + 1)}</span>{p.title}<span>+</span></a></li>)}</ol>
+        </nav>
+      </section>
+
+      <div class="vx">
+        {sequence.map(({ p, i, inter }) => {
+          if (inter) return (
+            <section class="g24 inter">
+              <div class="x-exp">
+                <p class="bar"><span>Experience</span><span>{pad(people.length)}</span></p>
+                {people.map((e) => (
+                  <details class="acc">
+                    <summary><span>{e.org}</span><span class="dim">{e.dates}</span></summary>
+                    <p><span class="dim">{e.role}.</span> {e.note}</p>
+                  </details>
                 ))}
-              </ul>
+              </div>
+              {inProgress.map((w, k) => (
+                <div class={`x-wip x-wip${k}`}>
+                  {w.image && (w.image.src || showDrafts) ? <Media media={w.image} ratio="p" /> : <div class="x-blank"><p>{w.line}</p></div>}
+                  <p class="bar"><span>{w.title}</span><span class="dim">{w.meta}</span></p>
+                </div>
+              ))}
+              <div class="x-glyph glyph-cell"><Glyph kind="plus" /></div>
             </section>
           );
-          if (t.kind === 'index') return (
-            <section class="tile txt" id="index" style={`order:${t.order}`}>
-              <h2 class="pill">Index</h2>
-              <ul class="list">
-                {index.map((r) => (
-                  <li>
-                    <span>{r.href ? <a href={r.href} target="_blank" rel="noopener">{r.title}<svg class="ext" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 8 8 2M3 2h5v5" fill="none" stroke="currentColor" stroke-width="1.2" /></svg></a> : r.title}</span>
-                    <span class="yr">{r.year}</span>
-                    <span class="sub">{r.type}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          );
+          const L = layouts[i % layouts.length];
           return (
-            <section class="tile txt" style={`order:${t.order}`}>
-              <h2 class="pill">Contact</h2>
-              <ul class="list">
-                <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
-                <li><a href={site.resume} target="_blank">Resume</a></li>
-                {site.links.map((l) => <li><a href={l.href} target="_blank" rel="noopener">{l.label}</a></li>)}
-                <li><span class="sub">{site.location}</span></li>
-              </ul>
-            </section>
+            <>
+              <section class="g24 mod" id={`p-${p.slug}`}>
+                <a class="cell m-cover" href={`/work/${p.slug}`} style={`--a:${L.cover}`}>
+                  <span class="cap">{p.title}, {p.year}</span>
+                  <Media media={p.cover} ratio="l" />
+                </a>
+                <a class="cell m-port" href={`/work/${p.slug}`} style={`--a:${L.port}`} tabindex="-1" aria-hidden="true"><Media media={p.portrait} ratio="p" /></a>
+                {thumbs(p).map((m, k) => <div class="cell m-thumb" style={`--a:${L.thumbs[k]}`} aria-hidden="true"><Media media={m} ratio="l" /></div>)}
+                <div class="cell m-info" style={`--a:${L.info}`}>
+                  <a class="bar" href={`/work/${p.slug}`}><span><span class="no">{pad(i + 1)}</span>{p.title}</span><span>{p.year}</span></a>
+                  <p class="m-line">{p.line}</p>
+                  <dl class="kv">{spec(p).map(([k, v]) => <><dt>{k}</dt><dd>{v}</dd></>)}
+                    {p.live && <><dt>Live</dt><dd><a href={p.live} target="_blank" rel="noopener">Visit site</a></dd></>}
+                  </dl>
+                  <p class="m-intro">{p.intro}</p>
+                  <a class="bar go" href={`/work/${p.slug}`}><span>View project</span><span>+</span></a>
+                </div>
+                <div class="cell glyph-cell m-glyph" style={`--a:${L.glyph}`}><Glyph kind={glyphs[i % glyphs.length]} /></div>
+              </section>
+            </>
           );
         })}
       </div>
-    ))}
+
+      <div class="vg">
+        <div class={MOSAIC ? "gt-grid mosaic" : "gt-grid"}>
+          {gridTiles.map((t) => {
+            if (t.kind === 'project') return (
+              <a class="gt" href={`/work/${t.p.slug}`} style={tileStyle(t)}>
+                <span class="bar"><span><span class="no">{pad(t.n)}</span>{t.p.title}</span><span>{t.p.year}</span></span>
+                <Media media={t.p.cover} ratio="l" />
+                <span class="gt-line">{t.p.line}</span>
+              </a>
+            );
+            if (t.kind === 'wip') return (
+              <div class="gt" style={tileStyle(t)}>
+                <span class="bar"><span>{t.w.title}</span><span class="dim">{t.w.meta}</span></span>
+                {t.w.image && (t.w.image.src || showDrafts) ? <Media media={t.w.image} ratio="l" /> : <span class="gt-body gt-soft"><span>In progress</span></span>}
+                <span class="gt-line">{t.w.line}</span>
+              </div>
+            );
+            if (t.kind === 'experience') return (
+              <div class="gt" style={tileStyle(t)}>
+                <span class="bar"><span>Experience</span><span>{pad(people.length)}</span></span>
+                <ul class="gt-body gt-list">{people.map((e) => <li><span>{e.org}</span><span class="dim">{shortDate(e.dates)}</span></li>)}</ul>
+                <span class="gt-line"><a href="/info">More on the info page +</a></span>
+              </div>
+            );
+            if (t.kind === 'contact') return (
+              <div class="gt" style={tileStyle(t)}>
+                <span class="bar"><span>Contact</span><span>{site.location}</span></span>
+                <ul class="gt-body gt-list">
+                  <li><a href={`mailto:${site.email}`}>{site.email}</a><span>+</span></li>
+                  <li><a href={site.resume} target="_blank">Resume</a><span>+</span></li>
+                  {site.links.map((l) => <li><a href={l.href} target="_blank" rel="noopener">{l.label}</a><span>+</span></li>)}
+                </ul>
+                <span class="gt-line">{site.status[2]}</span>
+              </div>
+            );
+            return (
+              <div class="gt" style={tileStyle(t)}>
+                <span class="bar"><span>Other work</span><span>{pad(index.length)}</span></span>
+                <ul class="gt-body gt-list">{index.slice(0, 7).map((r) => <li><span>{r.href ? <a href={r.href} target="_blank" rel="noopener">{r.title}</a> : r.title}</span><span class="dim">{r.year}</span></li>)}</ul>
+                <span class="gt-line"><a href="#all">Everything, newest first +</a></span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <section class="all" id="all">
+        <div class="tools">
+          <p class="bar"><span>All work</span><span>{pad(rows.length)}</span></p>
+          <p class="bar"><span>Newest first</span><span>↓</span></p>
+        </div>
+        <table>
+          <thead><tr><th>No.</th><th>Title</th><th>Type</th><th>Year</th><th>Role</th><th>Link</th></tr></thead>
+          <tbody>
+            {rows.map((r, k) => (
+              <tr>
+                <td>{pad(k + 1)}</td>
+                <td>{r.title}</td>
+                <td>{r.type}</td>
+                <td>{r.year}</td>
+                <td>{r.role}</td>
+                <td>{r.href ? <a href={r.href} target={r.href.startsWith('http') ? '_blank' : undefined} rel="noopener">{r.label} +</a> : ''}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+    </div>
+
+    <div class="vw-bottom">
+      <a class="chip" href={`mailto:${site.email}`}><span>Email</span><span>{site.email}</span></a>
+      <p class="bar"><span class="avail">{site.status[2]}</span><span><a href={site.resume} target="_blank">Resume</a>&nbsp;&nbsp;<a href="/info">Info</a></span></p>
+    </div>
   </div>
 </Base>
+
+<script>
+  const root = document.querySelector('.vw');
+  const buttons = root.querySelectorAll('[data-v]');
+  const mobile = matchMedia('(max-width: 760px)');
+  const current = () => (root.dataset.view === 'auto' ? (mobile.matches ? 'grid' : 'expanded') : root.dataset.view);
+  const sync = () => buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === current())));
+  buttons.forEach((b) => b.addEventListener('click', () => {
+    root.dataset.view = b.dataset.v;
+    localStorage.setItem('dx-view', b.dataset.v);
+    sync();
+    window.scrollTo({ top: 0 });
+  }));
+  mobile.addEventListener('change', sync);
+  sync();
+</script>
+
+<style is:global>
+  .vw{--gap:5px;padding:0 var(--gap) 96px;font-size:12px;line-height:1.3;color:var(--ink);}
+  .vw a:hover{text-decoration:underline;text-underline-offset:2px;}
+  .vw .bar{display:flex;justify-content:space-between;gap:12px;background:var(--pill);padding:5px 7px;min-width:0;}
+  .vw .bar > span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .vw a.bar:hover{background:var(--ph);text-decoration:none;}
+  .vw .chip{display:flex;justify-content:space-between;gap:24px;background:var(--ink);color:var(--bg);padding:5px 7px;}
+  .vw .dim{color:var(--mute);}
+  .vw .no{display:inline-block;min-width:36px;}
+  .vw .glyph{display:block;width:100%;height:100%;fill:none;stroke:var(--ink);stroke-width:1.25;}
+  .vw .glyph *{vector-effect:non-scaling-stroke;}
+
+  .vw-top{position:fixed;z-index:40;inset:0 0 auto 0;display:flex;justify-content:space-between;align-items:flex-start;padding:8px var(--gap);pointer-events:none;}
+  .vw-top > *{pointer-events:auto;}
+  .vw-logo{background:var(--bg);padding:5px 7px;margin-left:-7px;font-size:14px;letter-spacing:-.02em;}
+  .vw-right{display:flex;gap:var(--gap);}
+  .vw-right .chip{min-width:96px;}
+  .seg{display:flex;gap:1px;background:var(--bg);}
+  .seg button{all:unset;cursor:pointer;background:var(--pill);padding:5px 10px;}
+  .seg button:hover{background:var(--ph);}
+  .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);}
+  .seg button:focus-visible{outline:2px solid var(--ink);outline-offset:1px;}
+
+  .vw-bottom{position:fixed;z-index:40;left:calc(var(--gap) + (100% - 2 * var(--gap) + var(--gap)) / 24 * 6);right:var(--gap);bottom:var(--gap);display:grid;grid-template-columns:1fr 1fr;gap:var(--gap);}
+
+  /* the unit grid: 24 columns, rows exactly one column wide */
+  .vw-in{container-type:inline-size;}
+  .g24{--u:calc((100cqw - 23 * var(--gap)) / 24);display:grid;grid-template-columns:repeat(24,var(--u));grid-auto-rows:var(--u);gap:var(--gap);}
+  .g24 > .cell{grid-area:var(--a);min-width:0;min-height:0;}
+  .cell .slot{aspect-ratio:auto;height:100%;}
+  .glyph-cell{display:flex;}
+
+  .intro{padding-top:calc(var(--u) + var(--gap));margin-bottom:var(--u);}
+  .i-text{display:flex;flex-direction:column;gap:14px;}
+  .i-text h1{font-size:clamp(24px,3.3cqw,54px);line-height:1;letter-spacing:-.035em;font-weight:300;color:var(--mute);padding:0 7px;}
+  .i-text .nm{color:var(--ink);font-weight:400;}
+  .kv-list{margin:auto 0 0;padding:5px 7px;list-style:none;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);}
+  .i-toc ol{margin:0;padding:0;list-style:none;}
+  .i-toc a{display:grid;grid-template-columns:40px 1fr auto;padding:4px 7px;border-bottom:1px solid var(--rule);}
+  @container (max-width:1100px){
+    .intro{grid-auto-rows:auto;}
+    .intro .i-text{grid-area:1 / 1 / auto / span 24;}
+    .i-toc{display:none;}
+  }
+
+  .mod{margin-bottom:calc(var(--u) * 2);scroll-margin-top:48px;}
+  .m-cover,.m-port{position:relative;display:block;}
+  .m-cover .cap{position:absolute;z-index:1;left:0;top:0;background:var(--bg);padding:4px 7px 4px 0;}
+  .m-info{display:flex;flex-direction:column;gap:10px;overflow:hidden;}
+  .m-line{font-size:18px;line-height:1.12;letter-spacing:-.015em;font-weight:300;padding:0 7px;}
+  .kv{display:grid;grid-template-columns:minmax(72px,38%) 1fr;column-gap:10px;row-gap:1px;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);padding:5px 7px;margin:0;}
+  .kv dd{margin:0;}
+  .m-intro{flex:1 1 0;min-height:0;overflow:hidden;padding:0 7px;-webkit-mask-image:linear-gradient(#000 calc(100% - 20px),transparent);mask-image:linear-gradient(#000 calc(100% - 20px),transparent);}
+  .m-info .go{margin-top:auto;}
+
+  .inter{grid-auto-rows:auto;align-items:start;margin-bottom:calc(var(--u) * 2);}
+  .x-exp{grid-column:1 / span 8;}
+  .x-wip{display:flex;flex-direction:column;gap:var(--gap);}
+  .x-wip0{grid-column:11 / span 5;}
+  .x-wip1{grid-column:16 / span 5;}
+  .x-blank{aspect-ratio:4/5;background:var(--pill);display:flex;align-items:flex-end;}
+  .x-blank p{padding:7px;font-size:18px;line-height:1.12;letter-spacing:-.015em;font-weight:300;}
+  .x-glyph{grid-column:21 / span 4;aspect-ratio:1;}
+  .acc{border-bottom:1px solid var(--rule);}
+  .acc summary{display:flex;gap:12px;padding:5px 7px;cursor:pointer;list-style:none;}
+  .acc summary::-webkit-details-marker{display:none;}
+  .acc summary > :first-child{flex:1;}
+  .acc summary::after{content:'+';}
+  .acc[open] summary::after{content:'\2212';}
+  .acc p{padding:0 7px 8px;max-width:56ch;}
+
+  /* grid view */
+  .vg{display:none;padding-bottom:calc(var(--gap) * 12);}
+  .gt-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px var(--gap);}
+  .gt{display:flex;flex-direction:column;gap:var(--gap);min-width:0;}
+  a.gt:hover{text-decoration:none;}
+  a.gt:hover .bar{background:var(--ph);}
+  .gt-body{aspect-ratio:16/10;margin:0;overflow:hidden;}
+  .gt-soft{background:var(--pill);display:flex;align-items:flex-end;padding:7px;color:var(--mute);}
+  .gt-list{list-style:none;padding:0;}
+  .gt-list li{display:flex;justify-content:space-between;gap:12px;padding:2px 7px;border-bottom:1px solid var(--rule);white-space:nowrap;}
+  .gt-list li > :first-child{overflow:hidden;text-overflow:ellipsis;}
+  .gt-list li > :last-child{flex-shrink:0;}
+  .gt-line{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.6em;padding:0 7px;}
+
+  .vw[data-view="grid"] .vx{display:none;}
+  .vw[data-view="grid"] .vg{display:block;}
+  .vw[data-view="grid"] .i-toc{visibility:hidden;}
+  .gt-grid{grid-template-columns:repeat(6,minmax(0,1fr));}
+
+  @container (min-width:1260px){
+    .gt-grid.mosaic{--u:calc((100cqw - 23 * var(--gap)) / 24);grid-template-columns:repeat(24,var(--u));grid-auto-rows:var(--u);gap:var(--gap);}
+    .mosaic .gt{grid-area:var(--a);min-height:0;overflow:hidden;}
+    .mosaic .gt > .slot,.mosaic .gt > .gt-body{flex:1 1 0;min-height:0;aspect-ratio:auto;}
+  }
+
+  /* everything table */
+  .all{scroll-margin-top:48px;}
+  .tools{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--gap);margin-bottom:16px;}
+  .all table{width:calc(100% + 2 * var(--gap));border-collapse:separate;border-spacing:var(--gap) 0;margin:0 calc(-1 * var(--gap));table-layout:fixed;}
+  .all th{text-align:left;font-weight:400;color:var(--mute);padding:4px 0;}
+  .all td{padding:5px 0 3px;border-bottom:1px solid var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .all th:nth-child(1){width:6%;} .all th:nth-child(2){width:22%;} .all th:nth-child(3){width:30%;}
+  .all th:nth-child(4){width:11%;} .all th:nth-child(5){width:20%;}
+
+  @container (max-width:1270px){ .gt-grid{grid-template-columns:repeat(4,minmax(0,1fr));} }
+  @container (max-width:1150px){ .m-intro{display:none;} }
+  @container (max-width:980px){ .gt-grid{grid-template-columns:repeat(3,minmax(0,1fr));} }
+
+  @media (max-width:760px){
+    .vw{padding-bottom:64px;}
+    .vw-right .chip{display:none;}
+    .vw[data-view="auto"] .vx{display:none;}
+    .vw[data-view="auto"] .vg{display:block;}
+
+    .g24{display:flex;flex-direction:column;align-items:stretch;gap:var(--gap);}
+    .intro{padding-top:48px;margin-bottom:32px;gap:16px;}
+    .i-text h1{font-size:30px;line-height:1.05;}
+    .mod{margin-bottom:32px;}
+    .mod .cell{grid-area:auto;}
+    .m-cover .slot{aspect-ratio:16/10;height:auto;}
+    .m-port,.m-thumb,.m-glyph,.m-intro{display:none;}
+    .inter{gap:24px;margin-bottom:32px;}
+    .x-glyph{display:none;}
+
+    .gt-grid{grid-template-columns:1fr;gap:28px;}
+    .gt-body.gt-list{aspect-ratio:auto;}
+    .gt-soft{aspect-ratio:auto;min-height:80px;}
+
+    .tools{grid-template-columns:1fr 1fr;}
+    .all table,.all tbody{display:block;width:100%;margin:0;}
+    .all thead{display:none;}
+    .all tr{display:grid;grid-template-columns:1fr auto;column-gap:12px;padding:6px 0 5px;border-bottom:1px solid var(--ink);}
+    .all td{border:0;padding:0;white-space:normal;}
+    .all td:nth-child(1),.all td:nth-child(5){display:none;}
+    .all td:nth-child(2){grid-column:1;}
+    .all td:nth-child(4){grid-column:2;grid-row:1;}
+    .all td:nth-child(3){grid-column:1;color:var(--mute);}
+    .all td:nth-child(6){grid-column:2;grid-row:2;text-align:right;}
+
+    .vw-bottom{left:var(--gap);}
+    .vw-bottom .avail{display:none;}
+  }
+</style>
