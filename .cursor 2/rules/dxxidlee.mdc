@@ -1,0 +1,47 @@
+---
+description: Project rules for dxxidlee.com (David Lee portfolio)
+alwaysApply: true
+---
+
+# dxxidlee.com: project rules
+
+## Context
+Portfolio for David (Seungmin) Lee, Communication Design at Parsons (graduating May 2027), Design Intern at McCann New York.
+Target roles: product designer (new grad), design engineer, interaction designer, brand/visual designer, motion designer.
+Hard deadline: live on dxxidlee.com by Thursday, October 1, 2026, 2pm ET. Speed beats polish. Ship, then refine.
+
+## Stack (do not change)
+- Astro 5, static output, deployed on Vercel from GitHub. No backend, no CMS, no UI framework unless asked.
+- Self-hosted fonts via @fontsource or /public/fonts. No external font or script CDNs.
+- Plain CSS in src/styles/global.css (or scoped <style> in components). No Tailwind unless asked.
+
+## Architecture (keep these invariants)
+- ALL content lives in src/data/site.js and src/data/projects.js. Components never hardcode project text, years, or links.
+- ONE project template: src/pages/work/[slug].astro renders every project from its data entry. Never create per-project page files.
+- src/components/Media.astro handles every image and video:
+  no src = labeled placeholder at the right ratio; .mp4/.webm/.mov = muted, looped, playsinline video; else = lazy image.
+- Draft gating: projects with status 'draft' render only when showDrafts is true (dev, or PUBLIC_SHOW_DRAFTS=true at build time).
+  Placeholders must never appear in a production build without drafts. Preserve this when refactoring.
+- Block types on project pages: full, pair, embed, text. Add new types in the template and document them at the top of projects.js.
+
+## Media conventions
+- Files at public/media/<slug>/<name>.mp4|.jpg|.webp
+- Ratios: 16:10 landscape (covers, most blocks), 4:5 portrait (homepage pair, Instagram reuse), 16:9 for overviews and embeds.
+- Loops: H.264 MP4, 6 to 8 s, no audio, under 4 MB. Videos play only while in view (IntersectionObserver) and never autoplay under prefers-reduced-motion.
+- Full-length videos use the embed block (YouTube or Vimeo), never self-hosted.
+
+## Copy rules
+- Never use em dashes in any copy, comments, or UI text. Use commas, colons, or periods.
+- Never invent facts, credits, dates, clients, or metrics. Keep [bracketed placeholders] until David supplies the real value.
+- Sentence case. Plain verbs. One-line captions. No filler adjectives. Project pages stay under ~250 words.
+- McCann client work is NDA: only show internal tools with dummy content unless David confirms clearance.
+
+## Quality floor
+- Test at 390px and 1440px widths. Keyboard focus visible. Semantic HTML. Alt text comes from media labels.
+- Keep total JS minimal; no animation libraries unless asked. Lighthouse performance 90+ on the homepage.
+- Run `npm run build` and confirm zero errors before calling a task done.
+
+## Working style
+- Before large changes, state a short plan (files touched, what changes) and wait for a go.
+- Prefer small, reviewable diffs. Do not rename slugs or data fields without updating every reference.
+- Do not delete or rewrite content in projects.js unless explicitly asked; design changes happen in components and CSS.
