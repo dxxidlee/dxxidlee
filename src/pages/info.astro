@@ -1,30 +1,66 @@
 ---
 import Base from '../layouts/Base.astro';
 import { site } from '../data/site.js';
+import { showDrafts } from '../data/projects.js';
+import { pad, A } from '../lib/work.js';
 ---
-<Base title={`Info, ${site.name}`}>
-  <section class="info grid" style="margin-top:64px">
-    <p class="bio">David (Seungmin) Lee is a designer in New York working across identity systems, interfaces, and motion. He designs and codes his own websites and tools. [One sentence on what draws you to the work.]</p>
+<Base title={`Info, ${site.name}`} nav="info">
+  <section class="g24 intro">
+    <div class="cell i-text" style={`--a:${A(1, 16, 1, 4)}`}>
+      <p class="bar"><span>Info</span><span>{site.location}</span></p>
+      <h1><span class="nm">David (Seungmin) Lee</span> is a designer in New York working across identity systems, interfaces, and motion. He designs and codes his own websites and tools.{showDrafts && ' [One sentence on what draws you to the work.]'}</h1>
+      <ul class="kv-list">{site.status.map((s) => <li>{s}</li>)}</ul>
+    </div>
+    <div class="cell i-side" style={`--a:${A(19, 6, 1, 4)}`}>
+      <p class="bar"><span>Contact</span><span>{pad(site.links.length + 2)}</span></p>
+      <ul class="rows">
+        <li><a href={`mailto:${site.email}`}>{site.email}</a><span>+</span></li>
+        <li><a href={site.resume} target="_blank">Resume (PDF)</a><span>+</span></li>
+        {site.links.map((l) => <li><a href={l.href} target="_blank" rel="noopener">{l.label}</a><span>+</span></li>)}
+      </ul>
+    </div>
+  </section>
 
-    <div class="col"><h2 class="pill">Experience</h2><ul>
+  <section class="g24 inf">
+    <div class="inf-exp">
+      <p class="bar"><span>Experience</span><span>{pad(site.experience.length)}</span></p>
       {site.experience.map((e) => (
-        <li>{e.org}<br /><span class="mute">{e.role}, {e.dates}</span>{e.note && <p class="note">{e.note}</p>}</li>
+        <details class="acc" open>
+          <summary><span>{e.org}</span><span class="dim">{e.dates}</span></summary>
+          <p><span class="dim">{e.role}.</span> {e.note}</p>
+        </details>
       ))}
-    </ul></div>
-
-    <div class="col"><h2 class="pill">Education</h2><ul>
+    </div>
+    <div class="inf-edu">
+      <p class="bar"><span>Education</span><span>{pad(site.education.length)}</span></p>
       {site.education.map((e) => (
-        <li>{e.org}<br /><span class="mute">{e.role}, {e.dates}</span>{e.note && <p class="note">{e.note}</p>}</li>
+        <details class="acc" open>
+          <summary><span>{e.org}</span></summary>
+          <p><span class="dim">{e.role}, {e.dates}.</span> {e.note}</p>
+        </details>
       ))}
-    </ul>
-    <h2 class="pill">Skills</h2><ul>
-      {site.skills.map((s) => <li>{s.label}<br /><span class="mute">{s.items}</span></li>)}
-    </ul></div>
-
-    <div class="col"><h2 class="pill">Contact</h2><ul>
-      <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
-      <li><a href={site.resume} target="_blank">Resume (PDF)</a></li>
-      {site.links.map((l) => <li><a href={l.href} target="_blank" rel="noopener">{l.label}</a></li>)}
-    </ul></div>
+    </div>
+    <div class="inf-skl">
+      <p class="bar"><span>Skills</span><span>{pad(site.skills.length)}</span></p>
+      <dl class="kv">{site.skills.map((s) => <><dt>{s.label}</dt><dd>{s.items}</dd></>)}</dl>
+    </div>
   </section>
 </Base>
+
+<style is:global>
+  .inf{grid-auto-rows:auto;align-items:start;}
+  .inf > div{display:flex;flex-direction:column;gap:var(--gap);}
+  .inf-exp{grid-column:1 / span 12;}
+  .inf-edu{grid-column:13 / span 6;}
+  .inf-skl{grid-column:19 / span 6;}
+  .inf-skl .kv{row-gap:6px;}
+  @container (max-width:1100px){
+    .inf-exp{grid-column:1 / span 24;}
+    .inf-edu{grid-column:1 / span 12;margin-top:28px;}
+    .inf-skl{grid-column:13 / span 12;margin-top:28px;}
+  }
+  @media (max-width:760px){
+    .inf{gap:32px;}
+    .inf-edu,.inf-skl{margin-top:0;}
+  }
+</style>
