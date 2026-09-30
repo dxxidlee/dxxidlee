@@ -52,7 +52,7 @@ a.row{display:grid;text-decoration:none;}
 /* in progress */
 .wip{margin-bottom:var(--space);}
 .wip > div{grid-column:span 3;}
-.wip > div.txt{align-self:end;}
+.wip:has(.slot) > div.txt{align-self:end;}
 .wip p{margin-top:8px;}
 
 /* index */
