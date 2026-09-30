@@ -2,16 +2,23 @@
 import Base from '../layouts/Base.astro';
 import { site } from '../data/site.js';
 ---
-<Base title="Info, David Lee">
+<Base title={`Info, ${site.name}`}>
   <section class="info grid" style="margin-top:64px">
     <p class="bio">David (Seungmin) Lee is a designer in New York working across identity systems, interfaces, and motion. He designs and codes his own websites and tools. [One sentence on what draws you to the work.]</p>
 
     <div class="col"><h2 class="pill">Experience</h2><ul>
-      {site.experience.map((e) => <li>{e.org}<br /><span class="mute">{e.role}, {e.dates}</span></li>)}
+      {site.experience.map((e) => (
+        <li>{e.org}<br /><span class="mute">{e.role}, {e.dates}</span>{e.note && <p class="note">{e.note}</p>}</li>
+      ))}
     </ul></div>
 
     <div class="col"><h2 class="pill">Education</h2><ul>
-      {site.education.map((e) => <li>{e.org}<br /><span class="mute">{e.role}, {e.dates}</span></li>)}
+      {site.education.map((e) => (
+        <li>{e.org}<br /><span class="mute">{e.role}, {e.dates}</span>{e.note && <p class="note">{e.note}</p>}</li>
+      ))}
+    </ul>
+    <h2 class="pill">Skills</h2><ul>
+      {site.skills.map((s) => <li>{s.label}<br /><span class="mute">{s.items}</span></li>)}
     </ul></div>
 
     <div class="col"><h2 class="pill">Contact</h2><ul>

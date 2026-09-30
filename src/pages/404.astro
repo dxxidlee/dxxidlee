@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
+import { site } from '../data/site.js';
 ---
-<Base title="Not found, David Lee">
+<Base title={`Not found, ${site.name}`}>
   <p class="pj-line" style="margin:96px 0 var(--space)">This page doesn't exist. <a href="/">Go to selected work.</a></p>
 </Base>
