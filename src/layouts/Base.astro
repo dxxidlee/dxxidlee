@@ -1,9 +1,8 @@
 ---
 import '../styles/global.css';
+import Panel from '../components/Panel.astro';
 import { site } from '../data/site.js';
-const { title = site.title, description = site.description } = Astro.props;
-const path = Astro.url.pathname;
-const cur = (p) => (p === '/' ? path === '/' : path.startsWith(p)) ? 'page' : undefined;
+const { title = site.title, description = site.description, footer = true } = Astro.props;
 ---
 <!doctype html>
 <html lang="en">
@@ -19,24 +18,17 @@ const cur = (p) => (p === '/' ? path === '/' : path.startsWith(p)) ? 'page' : un
   <link rel="icon" href="/favicon.svg" />
 </head>
 <body>
-  <div class="wrap">
-    <header class="head">
-      <a href="/">{site.name}</a>
-      <nav>
-        <a href="/" aria-current={cur('/')}>Work</a>
-        <a href="/#index">Index</a>
-        <a href="/info" aria-current={cur('/info')}>Info</a>
-        <a href={site.resume} target="_blank">Resume</a>
-        <a class="opt" href={`mailto:${site.email}`}>Email</a>
-      </nav>
-    </header>
+  <Panel />
+  <main class="wrap">
     <slot />
-    <footer class="foot grid">
-      <a href={`mailto:${site.email}`}>{site.email}</a>
-      {site.links.map((l) => <a href={l.href} target="_blank" rel="noopener">{l.label}</a>)}
-      <span class="mute">{site.location}</span>
+  </main>
+  {footer && (
+    <footer class="wrap foot">
+      <a class="pill" href={`mailto:${site.email}`}>{site.email}</a>
+      {site.links.map((l) => <a class="pill" href={l.href} target="_blank" rel="noopener">{l.label}</a>)}
+      <span class="pill mute">{site.location}</span>
     </footer>
-  </div>
+  )}
   <script>
     // Loops play only while visible; respects reduced motion.
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;

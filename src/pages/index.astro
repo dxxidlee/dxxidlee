@@ -1,57 +1,98 @@
 ---
 import Base from '../layouts/Base.astro';
-import Media from '../components/Media.astro';
+import Tile from '../components/Tile.astro';
 import { site } from '../data/site.js';
 import { visible, inProgress, index, showDrafts } from '../data/projects.js';
----
-<Base>
-  <div class="mark">
-    {site.wordmark ? <img src={site.wordmark} alt={site.name} /> : <span class="fallback">{site.name}</span>}
-  </div>
 
-  <section class="intro grid">
-    <p class="pos">{site.positioning}</p>
-    <p class="status mute">{site.status.map((s) => <>{s}<br /></>)}</p>
+// Desktop collage: columns on a 12-track grid. `media` is the thumbnail ratio projects use in that column;
+// null means text tiles only. Tiles go to the shortest allowed column, like a masonry built at compile time.
+const cols = [
+  { span: 3, media: 'p' },
+  { span: 5, media: 'l' },
+  { span: 2, media: null },
+  { span: 2, media: 'l' },
+];
+const RATIO = { l: 10 / 16, p: 5 / 4 };
+const CAP = 0.75;
+
+const tiles = [
+  ...visible.map((p, i) => ({ kind: 'project', p, n: String(i + 1).padStart(2, '0') })),
+  { kind: 'experience', est: 2.65 },
+  ...inProgress.map((w) => {
+    const img = !!(w.image && (w.image.src || showDrafts));
+    return { kind: 'wip', w, img, est: 0.75 };
+  }),
+  { kind: 'index', est: 2.4 },
+  { kind: 'contact', est: 1.6 },
+];
+
+const heights = cols.map(() => 0);
+const placed = cols.map(() => []);
+tiles.forEach((t, order) => {
+  const allowed = t.kind === 'project' ? [1, 0, 3] : t.kind === 'index' ? [1] : [2, 3];
+  const c = allowed.reduce((a, b) => (heights[b] < heights[a] - 0.01 ? b : a));
+  const ratio = t.kind === 'project' ? cols[c].media : t.img ? 'p' : null;
+  heights[c] += ratio ? cols[c].span * RATIO[ratio] + CAP : t.est;
+  placed[c].push({ ...t, ratio, order });
+});
+---
+<Base footer={false}>
+  <section class="hero">
+    <h1>
+      {site.wordmark ? <img class="wordmark" src={site.wordmark} alt={site.name} /> : <span class="nm">{site.name}</span>}
+      <span class="ps">{site.positioning}</span>
+    </h1>
+    <ul class="status">{site.status.map((s) => <li class="pill">{s}</li>)}</ul>
   </section>
 
-  {visible.length > 0 && <div class="sec"><span>Selected work</span><span class="mute">2025 to now</span></div>}
-
-  {visible.map((p, i) => (
-    <a class={`row grid ${i % 2 ? 'flip' : ''}`} href={`/work/${p.slug}`}>
-      <Media media={p.cover} ratio="l" class="a" />
-      <Media media={p.portrait} ratio="p" class="b" />
-      <div class="cap grid">
-        <span class="n mute">{i + 1}</span>
-        <span class="t">{p.title}</span>
-        <span class="d">{p.line}</span>
-        <span class="k mute">{p.tags}</span>
-        <span class="y mute">{p.year}</span>
-      </div>
-    </a>
-  ))}
-
-  <div class="sec"><span>In progress</span><span class="mute">Shown when finished</span></div>
-  <section class="wip grid">
-    {inProgress.map((w) => (
-      <div class={w.image && (w.image.src || showDrafts) ? '' : 'txt'}>
-        {w.image && (w.image.src || showDrafts) && <Media media={w.image} ratio="p" />}
-        <p>{w.title} <span class="mute">{w.meta}</span></p>
-        <p class="mute">{w.line}</p>
+  <div class="collage" id="work">
+    {placed.map((list, c) => (
+      <div class="ccol" style={`--span:${cols[c].span}`}>
+        {list.map((t) => {
+          if (t.kind === 'project') return (
+            <Tile href={`/work/${t.p.slug}`} n={t.n} title={t.p.title} meta={t.p.year} line={t.p.line}
+              media={t.ratio === 'p' ? t.p.portrait : t.p.cover} ratio={t.ratio} order={t.order} />
+          );
+          if (t.kind === 'wip') return (
+            <Tile title={t.w.title} meta={t.w.meta} line={t.w.line} media={t.img ? t.w.image : null} ratio="p" order={t.order} />
+          );
+          if (t.kind === 'experience') return (
+            <section class="tile txt" style={`order:${t.order}`}>
+              <h2 class="pill">Experience</h2>
+              <ul class="list">
+                {[...site.experience, ...site.education].map((e) => (
+                  <li><span>{e.org}</span><span class="sub">{e.role}, {e.dates}</span></li>
+                ))}
+              </ul>
+            </section>
+          );
+          if (t.kind === 'index') return (
+            <section class="tile txt" id="index" style={`order:${t.order}`}>
+              <h2 class="pill">Index</h2>
+              <ul class="list">
+                {index.map((r) => (
+                  <li>
+                    <span>{r.href ? <a href={r.href} target="_blank" rel="noopener">{r.title} ↗</a> : r.title}</span>
+                    <span class="yr">{r.year}</span>
+                    <span class="sub">{r.type}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          );
+          return (
+            <section class="tile txt" style={`order:${t.order}`}>
+              <h2 class="pill">Contact</h2>
+              <ul class="list">
+                <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
+                <li><a href={site.resume} target="_blank">Resume</a></li>
+                {site.links.map((l) => <li><a href={l.href} target="_blank" rel="noopener">{l.label}</a></li>)}
+                <li><span class="sub">{site.location}</span></li>
+              </ul>
+            </section>
+          );
+        })}
       </div>
     ))}
-  </section>
-
-  <div class="sec" id="index"><span>Index</span><span class="mute">Everything else</span></div>
-  <table class="idx">
-    <tbody>
-      {index.map((r, i) => (
-        <tr>
-          <td>{visible.length + i + 1}</td>
-          <td>{r.href ? <a href={r.href} target="_blank" rel="noopener">{r.title}</a> : r.title}</td>
-          <td>{r.type}</td>
-          <td>{r.year}</td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
+  </div>
 </Base>
