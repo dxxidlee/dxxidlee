@@ -1,0 +1,51 @@
+---
+import '../styles/global.css';
+import { site } from '../data/site.js';
+const { title = site.title, description = site.description } = Astro.props;
+const path = Astro.url.pathname;
+const cur = (p) => (p === '/' ? path === '/' : path.startsWith(p)) ? 'page' : undefined;
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:image" content={new URL('/og.png', Astro.site)} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="/favicon.svg" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="head">
+      <a href="/">{site.name}</a>
+      <nav>
+        <a href="/" aria-current={cur('/')}>Work</a>
+        <a href="/#index">Index</a>
+        <a href="/info" aria-current={cur('/info')}>Info</a>
+        <a href={site.resume} target="_blank">Resume</a>
+        <a class="opt" href={`mailto:${site.email}`}>Email</a>
+      </nav>
+    </header>
+    <slot />
+    <footer class="foot grid">
+      <a href={`mailto:${site.email}`}>{site.email}</a>
+      {site.links.map((l) => <a href={l.href} target="_blank" rel="noopener">{l.label}</a>)}
+      <span class="mute">{site.location}</span>
+    </footer>
+  </div>
+  <script>
+    // Loops play only while visible; respects reduced motion.
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const vids = document.querySelectorAll('video[data-autoplay]');
+    if (!reduce && 'IntersectionObserver' in window) {
+      const io = new IntersectionObserver((es) => es.forEach((e) =>
+        e.isIntersecting ? e.target.play().catch(() => {}) : e.target.pause()), { threshold: 0.25 });
+      vids.forEach((v) => io.observe(v));
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../data/site.js';
+---
+<Base title="Info, David Lee">
+  <section class="info grid" style="margin-top:64px">
+    <p class="bio">David (Seungmin) Lee is a designer in New York working across identity systems, interfaces, and motion. He designs and codes his own websites and tools. [One sentence on what draws you to the work.]</p>
+
+    <div class="col"><h2>Experience</h2><ul>
+      <li>McCann New York<br /><span class="mute">Design Intern, [dates]</span></li>
+      <li>The Metropolitan Museum of Art, The Costume Institute<br /><span class="mute">Intern, [dates]</span></li>
+      <li>Studio Betty Wang<br /><span class="mute">Intern, [dates]</span></li>
+      <li>Hard Sun<br /><span class="mute">Intern, [dates]</span></li>
+    </ul></div>
+
+    <div class="col"><h2>Education</h2><ul>
+      <li>Parsons School of Design<br /><span class="mute">BFA Communication Design, 2027</span></li>
+    </ul></div>
+
+    <div class="col"><h2>Contact</h2><ul>
+      <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
+      <li><a href={site.resume} target="_blank">Resume (PDF)</a></li>
+      {site.links.map((l) => <li><a href={l.href} target="_blank" rel="noopener">{l.label}</a></li>)}
+    </ul></div>
+  </section>
+</Base>

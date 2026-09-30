@@ -1,0 +1,57 @@
+---
+import Base from '../layouts/Base.astro';
+import Media from '../components/Media.astro';
+import { site } from '../data/site.js';
+import { visible, inProgress, index } from '../data/projects.js';
+---
+<Base>
+  <div class="mark">
+    {site.wordmark ? <img src={site.wordmark} alt={site.name} /> : <span class="fallback">{site.name}</span>}
+  </div>
+
+  <section class="intro grid">
+    <p class="pos">{site.positioning}</p>
+    <p class="status mute">{site.status.map((s) => <>{s}<br /></>)}</p>
+  </section>
+
+  <div class="sec"><span>Selected work</span><span class="mute">2025 to now</span></div>
+
+  {visible.map((p, i) => (
+    <a class={`row grid ${i % 2 ? 'flip' : ''}`} href={`/work/${p.slug}`}>
+      <Media media={p.cover} ratio="l" class="a" />
+      <Media media={p.portrait} ratio="p" class="b" />
+      <div class="cap grid">
+        <span class="n mute">{i + 1}</span>
+        <span class="t">{p.title}</span>
+        <span class="d">{p.line}</span>
+        <span class="k mute">{p.tags}</span>
+        <span class="y mute">{p.year}</span>
+      </div>
+    </a>
+  ))}
+
+  <div class="sec"><span>In progress</span><span class="mute">Shown when finished</span></div>
+  <section class="wip grid">
+    {inProgress.map((w) => (
+      <div class={w.image ? '' : 'txt'}>
+        {w.image && <Media media={w.image} ratio="p" />}
+        <p>{w.title} <span class="mute">{w.meta}</span></p>
+        <p class="mute">{w.line}</p>
+      </div>
+    ))}
+  </section>
+
+  <div class="sec" id="index"><span>Index</span><span class="mute">Everything else</span></div>
+  <table class="idx">
+    <tbody>
+      {index.map((r, i) => (
+        <tr>
+          <td>{visible.length + i + 1}</td>
+          <td>{r.href ? <a href={r.href} target="_blank" rel="noopener">{r.title}</a> : r.title}</td>
+          <td>{r.type}</td>
+          <td>{r.year}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</Base>
