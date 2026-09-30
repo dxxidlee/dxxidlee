@@ -3,10 +3,9 @@
 // 16:10 is 24 x 15 or 16 x 10, 4:5 is 8 x 10, 16:9 is 16 x 9.
 import Base from '../../layouts/Base.astro';
 import Media from '../../components/Media.astro';
-import Module from '../../components/Module.astro';
 import { visible } from '../../data/projects.js';
 import { site } from '../../data/site.js';
-import { pad, A, layouts, glyphs, spec } from '../../lib/work.js';
+import { pad, A, spec } from '../../lib/work.js';
 
 export function getStaticPaths() {
   return visible.map((p, i) => ({ params: { slug: p.slug }, props: { p, i } }));
@@ -64,17 +63,23 @@ const blocks = p.blocks.map((b) => {
   ))}
 
   {next.slug !== p.slug && (
-    <>
-      <section class="g24 pj-next"><p class="cell bar" style={`--a:${A(1, 24, 1, 1)}`}><span>Next project</span><span>{pad(j + 1)} / {pad(visible.length)}</span></p></section>
-      <Module p={next} n={j + 1} L={layouts[j % layouts.length]} glyph={glyphs[j % glyphs.length]} />
-    </>
+    <section class="g24 intro pj-next">
+      <a class="cell i-text" href={`/work/${next.slug}`} style={`--a:${A(1, 16, 1, 4)}`}>
+        <span class="bar"><span><span class="no">{pad(j + 1)}</span>Next project</span><span>{next.tags}</span></span>
+        <span class="h1"><span class="nm">{next.title}</span> {next.line}</span>
+      </a>
+      <div class="cell i-side" style={`--a:${A(19, 6, 1, 4)}`}>
+        <p class="bar"><span>Up next</span><span>{pad(j + 1)} / {pad(visible.length)}</span></p>
+        <dl class="kv">{spec(next).map(([k, v]) => <><dt>{k}</dt><dd>{v}</dd></>)}</dl>
+        <a class="bar go" href={`/work/${next.slug}`}><span>View project</span><span>+</span></a>
+      </div>
+    </section>
   )}
 </Base>
 
 <style is:global>
   /* one empty unit between blocks keeps every block on the same lattice */
   .pj,.pj-txt{margin:0 0 calc(var(--u) + 2 * var(--gap));}
-  .i-side .go{margin-top:auto;}
   .pj-txt{grid-auto-rows:auto;}
   .pj-txt p{grid-column:7 / span 12;}
   .pj-lede{font-size:18px;line-height:1.2;letter-spacing:-.015em;font-weight:300;padding:0 7px;max-width:52ch;}
@@ -82,8 +87,10 @@ const blocks = p.blocks.map((b) => {
   .pj-cap{display:grid;grid-template-columns:48px 1fr;gap:10px;align-self:start;border-top:1px solid var(--ink);padding:5px 7px;}
   .pj-embed{position:relative;height:100%;background:var(--ph);}
   .pj-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
-  .pj-next{margin-bottom:var(--gap);}
-  .pj-next .bar{align-self:start;}
+  .pj-next{border-top:1px solid var(--ink);}
+  .pj-next a.i-text:hover{text-decoration:none;}
+  .pj-next a.i-text:hover .bar{background:var(--ph);}
+  .pj-next a.i-text:hover .nm{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.08em;}
   @container (max-width:980px){ .pj-txt p{grid-column:4 / span 18;} }
 
   @media (max-width:760px){
@@ -91,6 +98,7 @@ const blocks = p.blocks.map((b) => {
     .pj .cell .slot{height:auto;}
     .pj .slot.l{aspect-ratio:16/10;} .pj .slot.w{aspect-ratio:16/9;} .pj .slot.p{aspect-ratio:4/5;}
     .pj-embed{aspect-ratio:16/9;height:auto;}
-    .pj-next{margin-bottom:var(--gap);}
+    .pj-cap{align-self:stretch;}
+    .pj-next{padding-top:32px;}
   }
 </style>
