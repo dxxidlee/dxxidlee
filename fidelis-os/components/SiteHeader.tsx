@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Logo } from "@/components/Logo";
 
 const NAV = [
   { href: "/foundry", label: "Foundry" },
@@ -16,8 +17,8 @@ export function SiteHeader() {
 
   return (
     <header className="vw-top">
-      <Link href="/" className="vw-logo">
-        Fidelis OS
+      <Link href="/" className="vw-logo" aria-label="Fidelis OS, home">
+        <Logo />
       </Link>
       <nav className="seg" aria-label="Site">
         {NAV.map((item) => (

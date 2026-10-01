@@ -6,6 +6,7 @@ import "@/styles/globals.css";
 export const metadata: Metadata = {
   title: { default: "Fidelis OS", template: "%s | Fidelis OS" },
   description: "Trust, manufactured.",
+  icons: { icon: { url: "/fidelis-favicon.svg", type: "image/svg+xml" } },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -31,6 +31,7 @@ Prototype styling uses the design system from David's portfolio (the `dxxidlee` 
 - Typeface: Inter Tight 300 and 400 (`@fontsource/inter-tight`). 12px UI, 14px body, 18px light lines, light display headlines with the lead phrase in ink and the rest in gray.
 - Components from the portfolio system: `.bar` (smoke strip), `.chip` (black action), `.seg` nav, `.kv` and `.rows` lists with silver rules, the 24-column `.g24` grid with 5px gap, intro (16 units text, 6 units side) and module (16 units media, 6 units info) layouts, fixed top header and bottom bar.
 - Copy: sentence case, no em dashes.
+- Brand marks (supplied by David): `public/fidelis-vw-logo.svg` (white wordmark) shown in a black box by `components/Logo.tsx` in the site header and kiosk headers; `public/fidelis-favicon.svg` (black mark, transparent) is the favicon via `metadata.icons` in `app/layout.tsx`.
 - No gradients, shadows, rounded corners, icon libraries, or decorative motion.
 - Components small and semantic so they are easy to restyle.
 

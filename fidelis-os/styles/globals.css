@@ -88,9 +88,25 @@ a {
 
 .vw-logo {
   display: block;
-  padding: var(--row-y) var(--pad-x);
-  margin-left: calc(var(--pad-x) * -1);
-  font-size: var(--text-body);
+}
+
+.vw .vw-logo:hover .logo {
+  background: var(--mute);
+}
+
+/* Wordmark in a black box, the same height as a nav button or bar beside it */
+.logo {
+  display: inline-flex;
+  align-items: center;
+  background: var(--ink);
+  padding: var(--pad-y) 10px;
+  vertical-align: top;
+}
+
+.logo img {
+  display: block;
+  height: calc(1em * var(--leading-ui));
+  width: auto;
 }
 
 .vw-bottom {
