@@ -10,7 +10,7 @@
 
 .vw-top{position:fixed;z-index:40;inset:0 0 auto 0;display:flex;justify-content:space-between;align-items:flex-start;padding:8px var(--gap);pointer-events:none;}
 .vw-top > *{pointer-events:auto;}
-.vw-logo{display:block;background:var(--bg);padding:4px 7px;margin-left:-7px;}
+.vw-logo{display:block;padding:4px 7px;margin-left:-7px;}
 .vw-logo img{display:block;height:17.6px;width:auto;}
 .vw-right{display:flex;gap:var(--gap);}
 .vw-right .chip{min-width:96px;}
