@@ -50,16 +50,18 @@ const tileStyle = (t) => (MOSAIC && mosaic[tileKey(t)] ? `--a:${mosaic[tileKey(t
 
       <section class="g24 intro">
         <div class="cell i-text" style={`--a:${A(1, 16, 1, 4)}`}>
+          <h1><span class="nm">{site.name}</span> {site.positioning}</h1>
+        </div>
+        <div class="cell i-side" style={`--a:${A(19, 6, 1, 4)}`}>
           <div class="bars">
             <p class="bar"><span>{site.fullName}</span><span>{site.location}</span></p>
             {site.status.map((s) => <p class="bar">{pair(s).map((t) => <span>{t}</span>)}</p>)}
           </div>
-          <h1><span class="nm">{site.name}</span> {site.positioning}</h1>
+          <nav class="i-toc" aria-label="Contents">
+            <p class="bar"><span>Contents</span><span>{pad(visible.length)}</span></p>
+            <ol>{visible.map((p, i) => <li><a href={`#p-${p.slug}`}><span>{pad(i + 1)}</span>{p.title}<span>+</span></a></li>)}</ol>
+          </nav>
         </div>
-        <nav class="cell i-toc" style={`--a:${A(19, 6, 1, 4)}`} aria-label="Contents">
-          <p class="bar"><span>Contents</span><span>{pad(visible.length)}</span></p>
-          <ol>{visible.map((p, i) => <li><a href={`#p-${p.slug}`}><span>{pad(i + 1)}</span>{p.title}<span>+</span></a></li>)}</ol>
-        </nav>
       </section>
 
       <div class="vx">
