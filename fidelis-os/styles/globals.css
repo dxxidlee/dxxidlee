@@ -88,24 +88,21 @@ a {
 
 .vw-logo {
   display: block;
+  padding: var(--row-y) var(--pad-x);
+  margin-left: calc(var(--pad-x) * -1);
 }
 
-.vw .vw-logo:hover .logo {
-  background: var(--mute);
-}
-
-/* Wordmark in a black box, the same height as a nav button or bar beside it */
+/* The Fidelis mark on a transparent background, as the portfolio sets its logo:
+   17.6px tall in the 12px header, so with its padding it matches the nav buttons. */
 .logo {
   display: inline-flex;
   align-items: center;
-  background: var(--ink);
-  padding: var(--pad-y) 10px;
   vertical-align: top;
 }
 
 .logo img {
   display: block;
-  height: calc(1em * var(--leading-ui));
+  height: 1.4667em;
   width: auto;
 }
 
