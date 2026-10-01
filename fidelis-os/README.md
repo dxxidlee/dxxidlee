@@ -29,6 +29,13 @@ puts it in `/store`.
 
 Needs `ANTHROPIC_API_KEY` in `.env.local`. Restart `npm run dev` after editing it.
 
+## Holdings and Trust Manual
+
+- `/holdings`: every subsidiary ranked by believers, with 24h change and
+  status. Polls `/api/holdings` every 5 seconds (`lib/realtime.ts`).
+- `/manual`: every manual entry, filed under each trust device it uses.
+  Device definitions are in `lib/trust-devices.ts`.
+
 ## Database (v1)
 
 Local SQLite at `data/fidelis.db`. It is created and seeded with the four

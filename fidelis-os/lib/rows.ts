@@ -25,6 +25,8 @@ export type SubsidiaryRow = {
   status: string;
   is_flagship: number;
   listed_at: string | null;
+  /** Status with discontinuation applied, when the query computes it. */
+  effective_status?: string;
 };
 
 export function fromRow(row: SubsidiaryRow): Subsidiary {
@@ -35,6 +37,7 @@ export function fromRow(row: SubsidiaryRow): Subsidiary {
     trust_devices: JSON.parse(row.trust_devices),
     packaging: JSON.parse(row.packaging),
     is_flagship: row.is_flagship === 1,
+    status: row.effective_status ?? row.status,
   });
 }
 

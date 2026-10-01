@@ -80,3 +80,25 @@ export type NewSubsidiary = Omit<
 > & {
   status?: Status;
 };
+
+/** One row of the Holdings table. */
+export type Holding = {
+  rank: number;
+  slug: string;
+  company_name: string;
+  product_name: string;
+  category: Category;
+  believers: number;
+  /** Beliefs recorded in the last 24 hours. */
+  delta_24h: number;
+  /** Includes discontinuation computed on read. */
+  status: Status;
+  created_at: string;
+  listed: boolean;
+};
+
+export type HoldingsReport = {
+  generated_at: string;
+  holdings: Holding[];
+  totals: { subsidiaries: number; believers: number; delta_24h: number };
+};

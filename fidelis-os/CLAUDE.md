@@ -82,7 +82,8 @@ Fill remaining fields in the same voice.
 
 - Rank by believers.
 - 24h delta from `beliefs` timestamps.
-- Mark `discontinued` if zero new believers in 14 days (computed on read).
+- Mark `discontinued` if zero new believers in 14 days (computed on read). The clock starts at the latest of: newest belief, listing date, founding date, so new subsidiaries get a full 14 days. Flagships are exempt (decision in milestone 4: their seeded history is relative to database creation). Computed status applies everywhere: Holdings shows it, the Store hides discontinued subsidiaries, and Believe refuses them. SQL lives in `lib/subsidiaries.ts`.
+- Realtime in v1: the Holdings table polls `GET /api/holdings` every 5 seconds (`lib/realtime.ts`).
 - Mergers and acquisitions: v2, not now.
 
 ## Milestones
