@@ -23,7 +23,7 @@ const onHome = Astro.url.pathname === '/';
 <body>
   <div class="vw">
     <header class="vw-top">
-      <a class="vw-logo" href="/">{site.name}</a>
+      <a class="vw-logo" href="/"><img src="/favicon-extended.svg" alt={site.name} width="45" height="18" /></a>
       <div class="vw-right">
         <slot name="right">
           <nav class="seg" aria-label="Site">
@@ -41,7 +41,7 @@ const onHome = Astro.url.pathname === '/';
 
     <div class="vw-bottom">
       <a class="chip" href={`mailto:${site.email}`}><span>Email</span><span>{site.email}</span></a>
-      <p class="bar"><span class="avail">{site.status[2]}</span><span><a href={site.resume} target="_blank">Resume</a>&nbsp;&nbsp;<a href="/info">Info</a></span></p>
+      <p class="bar"><span></span><span><a href={site.resume} target="_blank">Resume</a>&nbsp;&nbsp;<a href="/info">Info</a></span></p>
     </div>
   </div>
   <script>

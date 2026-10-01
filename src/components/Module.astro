@@ -1,9 +1,8 @@
 ---
-// One project on the unit grid: cover, portrait, thumbnails, info column, and a glyph.
+// One project on the unit grid: cover, portrait, thumbnails, and an info column.
 import Media from './Media.astro';
-import Glyph from './Glyph.astro';
 import { pad, thumbs, spec } from '../lib/work.js';
-const { p, n, L, glyph, id } = Astro.props;
+const { p, n, L, id } = Astro.props;
 const href = `/work/${p.slug}`;
 ---
 <section class="g24 mod" id={id}>
@@ -16,11 +15,10 @@ const href = `/work/${p.slug}`;
   <div class="cell m-info" style={`--a:${L.info}`}>
     <a class="bar" href={href}><span><span class="no">{pad(n)}</span>{p.title}</span><span>{p.year}</span></a>
     <p class="m-line">{p.line}</p>
-    <dl class="kv">{spec(p).map(([k, v]) => <><dt>{k}</dt><dd>{v}</dd></>)}
-      {p.live && <><dt>Live</dt><dd><a href={p.live} target="_blank" rel="noopener">Visit site</a></dd></>}
+    <dl class="kv">{spec(p).map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}
+      {p.live && <div><dt>Live</dt><dd><a href={p.live} target="_blank" rel="noopener">Visit site</a></dd></div>}
     </dl>
     <p class="m-intro">{p.intro}</p>
     <a class="bar go" href={href}><span>View project</span><span>+</span></a>
   </div>
-  <div class="cell glyph-cell m-glyph" style={`--a:${L.glyph}`}><Glyph kind={glyph} /></div>
 </section>

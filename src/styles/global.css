@@ -15,6 +15,8 @@ body{margin:0;font-family:var(--sans);font-optical-sizing:auto;font-weight:400;f
 :where(p,h1,h2,h3,dl,dd,figure,ul){margin:0;}
 :where(ul){padding:0;list-style:none;}
 a{color:inherit;text-decoration:none;}
+/* favicon.svg keeps explicit width and height attributes so browsers accept it as a cursor */
+html,a,button,summary{cursor:url('/favicon.svg') 16 16,auto;}
 :focus-visible{outline:2px solid var(--ink);outline-offset:2px;}
 
 /* media slot */
