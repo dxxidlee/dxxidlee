@@ -2,6 +2,8 @@
 import { visible, index } from '../data/projects.js';
 
 export const pad = (n) => String(n).padStart(3, '0');
+// 'Role, Place' -> ['Role', 'Place'] for a two-sided bar.
+export const pair = (s) => { const k = s.indexOf(', '); return k < 0 ? [s, ''] : [s.slice(0, k), s.slice(k + 2)]; };
 
 // Grid area on the 24-column square-unit grid: column, column span, row, row span.
 // Every cell starts and ends on a unit line, so neighbouring edges always meet exactly.

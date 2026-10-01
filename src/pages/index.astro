@@ -6,7 +6,7 @@ import Media from '../components/Media.astro';
 import Module from '../components/Module.astro';
 import { site } from '../data/site.js';
 import { visible, inProgress, index, showDrafts } from '../data/projects.js';
-import { pad, A, layouts, rows } from '../lib/work.js';
+import { pad, pair, A, layouts, rows } from '../lib/work.js';
 
 const people = [...site.experience, ...site.education];
 const shortDate = (d) => (/present/i.test(d) ? 'Now' : (d.match(/\d{4}/g) || ['']).pop());
@@ -40,7 +40,7 @@ const tileStyle = (t) => (MOSAIC && mosaic[tileKey(t)] ? `--a:${mosaic[tileKey(t
 ---
 <Base>
   <Fragment slot="right">
-    <script is:inline>document.currentScript.closest('.vw').dataset.view = localStorage.getItem('dx-view') || 'auto';</script>
+    <script is:inline>document.currentScript.closest('.vw').dataset.view = localStorage.getItem('dx-view-v2') || 'grid';</script>
     <div class="seg" role="group" aria-label="View">
       <button type="button" data-v="expanded">Expanded</button>
       <button type="button" data-v="grid">Grid</button>
@@ -50,9 +50,11 @@ const tileStyle = (t) => (MOSAIC && mosaic[tileKey(t)] ? `--a:${mosaic[tileKey(t
 
       <section class="g24 intro">
         <div class="cell i-text" style={`--a:${A(1, 16, 1, 4)}`}>
-          <p class="bar"><span>{site.fullName}</span><span>{site.location}</span></p>
+          <div class="bars">
+            <p class="bar"><span>{site.fullName}</span><span>{site.location}</span></p>
+            {site.status.map((s) => <p class="bar">{pair(s).map((t) => <span>{t}</span>)}</p>)}
+          </div>
           <h1><span class="nm">{site.name}</span> {site.positioning}</h1>
-          <ul class="kv-list">{site.status.map((s) => <li>{s}</li>)}</ul>
         </div>
         <nav class="cell i-toc" style={`--a:${A(19, 6, 1, 4)}`} aria-label="Contents">
           <p class="bar"><span>Contents</span><span>{pad(visible.length)}</span></p>
@@ -157,16 +159,13 @@ const tileStyle = (t) => (MOSAIC && mosaic[tileKey(t)] ? `--a:${mosaic[tileKey(t
 <script>
   const root = document.querySelector('.vw');
   const buttons = root.querySelectorAll('[data-v]');
-  const mobile = matchMedia('(max-width: 760px)');
-  const current = () => (root.dataset.view === 'auto' ? (mobile.matches ? 'grid' : 'expanded') : root.dataset.view);
-  const sync = () => buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === current())));
+  const sync = () => buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === root.dataset.view)));
   buttons.forEach((b) => b.addEventListener('click', () => {
     root.dataset.view = b.dataset.v;
-    localStorage.setItem('dx-view', b.dataset.v);
+    localStorage.setItem('dx-view-v2', b.dataset.v);
     sync();
     window.scrollTo({ top: 0 });
   }));
-  mobile.addEventListener('change', sync);
   sync();
 </script>
 
@@ -208,16 +207,15 @@ const tileStyle = (t) => (MOSAIC && mosaic[tileKey(t)] ? `--a:${mosaic[tileKey(t
   .tools{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--gap);margin-bottom:16px;}
   .all table{width:calc(100% + 2 * var(--gap));border-collapse:separate;border-spacing:var(--gap) 0;margin:0 calc(-1 * var(--gap));table-layout:fixed;}
   .all th{text-align:left;font-weight:400;color:var(--mute);padding:4px 0;}
-  .all td{padding:5px 0 3px;border-bottom:1px solid var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .all td{padding:5px 0 3px;border-bottom:1px solid var(--rule);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .all th:nth-child(1){width:6%;} .all th:nth-child(2){width:22%;} .all th:nth-child(3){width:30%;}
   .all th:nth-child(4){width:11%;} .all th:nth-child(5){width:20%;}
+  .all td:nth-child(1),.all td:nth-child(3),.all td:nth-child(4),.all td:nth-child(5){color:var(--mute);}
 
   @container (max-width:1270px){ .gt-grid{grid-template-columns:repeat(4,minmax(0,1fr));} }
   @container (max-width:980px){ .gt-grid{grid-template-columns:repeat(3,minmax(0,1fr));} }
 
   @media (max-width:760px){
-    .vw[data-view="auto"] .vx{display:none;}
-    .vw[data-view="auto"] .vg{display:block;}
 
     .inter{gap:24px;margin-bottom:32px;}
     .gt-grid{grid-template-columns:1fr;gap:28px;}
@@ -227,7 +225,7 @@ const tileStyle = (t) => (MOSAIC && mosaic[tileKey(t)] ? `--a:${mosaic[tileKey(t
     .tools{grid-template-columns:1fr 1fr;}
     .all table,.all tbody{display:block;width:100%;margin:0;}
     .all thead{display:none;}
-    .all tr{display:grid;grid-template-columns:1fr auto;column-gap:12px;padding:6px 0 5px;border-bottom:1px solid var(--ink);}
+    .all tr{display:grid;grid-template-columns:1fr auto;column-gap:12px;padding:6px 0 5px;border-bottom:1px solid var(--rule);}
     .all td{border:0;padding:0;white-space:normal;}
     .all td:nth-child(1),.all td:nth-child(5){display:none;}
     .all td:nth-child(2){grid-column:1;}

@@ -2,14 +2,17 @@
 import Base from '../layouts/Base.astro';
 import { site } from '../data/site.js';
 import { showDrafts } from '../data/projects.js';
-import { pad, A } from '../lib/work.js';
+import { pad, pair, A } from '../lib/work.js';
+const rowCount = 1 + Math.max(site.experience.length, site.education.length, site.skills.length);
 ---
-<Base title={`Info, ${site.name}`} nav="info">
+<Base nav="info">
   <section class="g24 intro">
     <div class="cell i-text" style={`--a:${A(1, 16, 1, 4)}`}>
-      <p class="bar"><span>Info</span><span>{site.location}</span></p>
+      <div class="bars">
+        <p class="bar"><span>Info</span><span>{site.location}</span></p>
+        {site.status.map((s) => <p class="bar">{pair(s).map((t) => <span>{t}</span>)}</p>)}
+      </div>
       <h1><span class="nm">{site.fullName}</span> is a designer in New York working across identity systems, interfaces, and motion. He designs and codes his own websites and tools.{showDrafts && ' [One sentence on what draws you to the work.]'}</h1>
-      <ul class="kv-list">{site.status.map((s) => <li>{s}</li>)}</ul>
     </div>
     <div class="cell i-side" style={`--a:${A(19, 6, 1, 4)}`}>
       <p class="bar"><span>Contact</span><span>{pad(site.links.length + 2)}</span></p>
@@ -21,7 +24,7 @@ import { pad, A } from '../lib/work.js';
     </div>
   </section>
 
-  <section class="g24 inf">
+  <section class="g24 inf" style={`--n:${rowCount}`}>
     <div class="inf-exp">
       <p class="bar"><span>Experience</span><span>{pad(site.experience.length)}</span></p>
       {site.experience.map((e) => (
@@ -42,18 +45,22 @@ import { pad, A } from '../lib/work.js';
     </div>
     <div class="inf-skl">
       <p class="bar"><span>Skills</span><span>{pad(site.skills.length)}</span></p>
-      <dl class="kv">{site.skills.map((s) => <div><dt>{s.label}</dt><dd>{s.items}</dd></div>)}</dl>
+      <dl class="skl">{site.skills.map((s) => <div><dt>{s.label}</dt><dd>{s.items}</dd></div>)}</dl>
     </div>
   </section>
 </Base>
 
 <style is:global>
-  .inf{grid-auto-rows:auto;align-items:start;}
-  .inf > div{display:flex;flex-direction:column;gap:var(--gap);}
+  /* the three columns share one set of rows, so every divider lines up across them */
+  .inf{grid-auto-rows:auto;}
+  .inf > div{display:grid;grid-row:span var(--n);grid-template-rows:subgrid;}
+  .skl{display:contents;}
   .inf-exp{grid-column:1 / span 12;}
   .inf-edu{grid-column:13 / span 6;}
   .inf-skl{grid-column:19 / span 6;}
-  .inf-skl dt{color:var(--mute);}
+  .skl > div{border-bottom:1px solid var(--rule);}
+  .skl dt{padding:5px 7px;color:var(--mute);}
+  .skl dd{margin:0;padding:0 7px 8px;}
   @container (max-width:1100px){
     .inf-exp{grid-column:1 / span 24;}
     .inf-edu{grid-column:1 / span 12;margin-top:28px;}
@@ -61,6 +68,7 @@ import { pad, A } from '../lib/work.js';
   }
   @media (max-width:760px){
     .inf{gap:32px;}
+    .inf > div{display:flex;flex-direction:column;gap:var(--gap);}
     .inf-edu,.inf-skl{margin-top:0;}
   }
 </style>
