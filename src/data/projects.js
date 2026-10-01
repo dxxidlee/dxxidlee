@@ -125,7 +125,7 @@ export const projects = [
     role: 'Type design',
     tools: 'Glyphs',
     live: null,
-    cover: m('16:10, glyph grid'),
+    cover: m('PROTOCOL / XR glyph grid', '/media/protocol/cover.jpg'),
     portrait: m('4:5, specimen booklet photo'),
     intro: 'PROTOCOL grew out of XR, a circular-unit Didone built in Glyphs at Parsons School of Design. Each letter carries one rule of a dystopian bureaucratic rulebook, published as a type specimen.',
     blocks: [
