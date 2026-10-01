@@ -1,0 +1,599 @@
+/*
+  The dxxidlee.com system, applied to Fidelis OS.
+  Bars, chips, the fixed header and bottom bar, and the 24-column unit grid.
+  Uses tokens; defines none.
+*/
+@import "./tokens.css";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--sans);
+  font-optical-sizing: auto;
+  font-weight: var(--weight-regular);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+:where(p, h1, h2, h3, dl, dd, figure, ul, ol) {
+  margin: 0;
+}
+
+:where(h1, h2, h3) {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+:where(ul, ol) {
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: var(--focus-width) solid var(--ink);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
+
+/* Shell */
+
+.vw {
+  padding: 0 var(--gap) var(--page-bottom);
+  font-size: var(--text-ui);
+  line-height: var(--leading-ui);
+  color: var(--ink);
+}
+
+.vw a:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.vw-top {
+  position: fixed;
+  z-index: 40;
+  inset: 0 0 auto 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 8px var(--gap);
+  pointer-events: none;
+}
+
+.vw-top > * {
+  pointer-events: auto;
+}
+
+.vw-logo {
+  display: block;
+  padding: var(--row-y) var(--pad-x);
+  margin-left: calc(var(--pad-x) * -1);
+  font-size: var(--text-body);
+}
+
+.vw-bottom {
+  position: fixed;
+  z-index: 40;
+  left: calc(var(--gap) + (100% - 2 * var(--gap) + var(--gap)) / 24 * 6);
+  right: var(--gap);
+  bottom: var(--gap);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap);
+}
+
+/* Bars and chips */
+
+.bar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--pill);
+  padding: var(--pad-y) var(--pad-x);
+  min-width: 0;
+}
+
+.bar > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vw a.bar:hover {
+  background: var(--ph);
+  text-decoration: none;
+}
+
+.chip {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  background: var(--ink);
+  color: var(--bg);
+  padding: var(--pad-y) var(--pad-x);
+}
+
+button.chip {
+  width: 100%;
+  border: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+button.chip:disabled {
+  background: var(--mute);
+  cursor: default;
+}
+
+.vw a.chip:hover {
+  text-decoration: none;
+  background: var(--mute);
+}
+
+.dim {
+  color: var(--mute);
+}
+
+.no {
+  display: inline-block;
+  min-width: 36px;
+}
+
+/* Segmented nav */
+
+.seg {
+  display: flex;
+  gap: 1px;
+  background: var(--bg);
+}
+
+.seg a {
+  background: var(--pill);
+  padding: var(--pad-y) 10px;
+}
+
+.vw .seg a:hover {
+  background: var(--ph);
+  text-decoration: none;
+}
+
+.seg a[aria-current] {
+  background: var(--ink);
+  color: var(--bg);
+}
+
+/* The unit grid: 24 columns. Rows size to content. */
+
+.vw-in {
+  container-type: inline-size;
+}
+
+.g24 {
+  --u: calc((100cqw - 23 * var(--gap)) / 24);
+  display: grid;
+  grid-template-columns: repeat(var(--columns), var(--u));
+  gap: var(--gap);
+}
+
+.g24 > * {
+  min-width: 0;
+}
+
+/* Page intro: text on the left 16 units, a side column on the right 6 */
+
+.intro {
+  padding-top: calc(var(--u) + var(--gap));
+  margin-bottom: var(--u);
+}
+
+.i-text {
+  grid-column: 1 / span 16;
+  display: flex;
+  flex-direction: column;
+  gap: var(--stack);
+}
+
+.i-text h1 {
+  display: block;
+  font-size: var(--text-display);
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+  font-weight: var(--weight-light);
+  color: var(--mute);
+  padding: 0 var(--pad-x);
+}
+
+.i-text .nm {
+  color: var(--ink);
+  font-weight: var(--weight-regular);
+}
+
+.i-side {
+  grid-column: 19 / span 6;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+.i-side .go {
+  margin-top: auto;
+}
+
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+.line {
+  font-size: var(--text-line);
+  line-height: var(--leading-line);
+  letter-spacing: var(--tracking-line);
+  font-weight: var(--weight-light);
+  padding: 0 var(--pad-x);
+}
+
+.rows li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: var(--row-y) var(--pad-x);
+  border-bottom: var(--rule-width) solid var(--rule);
+}
+
+/* Key and value rows */
+
+.kv > div {
+  display: grid;
+  grid-template-columns: minmax(72px, 38%) 1fr;
+  column-gap: 10px;
+  padding: var(--row-y) var(--pad-x);
+  border-bottom: var(--rule-width) solid var(--rule);
+}
+
+.kv dt {
+  color: var(--mute);
+}
+
+.kv dd {
+  margin: 0;
+}
+
+.kv .pre {
+  white-space: pre-line;
+}
+
+/* A module: media on the left 16 units, info on the right 6 */
+
+.mod {
+  margin-bottom: calc(var(--u) * 2);
+}
+
+.m-media {
+  grid-column: 1 / span 16;
+}
+
+.m-info {
+  grid-column: 19 / span 6;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sheet {
+  background: var(--pill);
+  padding: var(--u);
+}
+
+.sheet svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Store cards */
+
+.cards {
+  row-gap: calc(var(--u) / 2);
+}
+
+.card {
+  grid-column: span 6;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card .go {
+  margin-top: auto;
+}
+
+/* Foundry intake */
+
+.intake {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+.intake textarea {
+  font: inherit;
+  font-size: var(--text-line);
+  line-height: var(--leading-line);
+  letter-spacing: var(--tracking-line);
+  font-weight: var(--weight-light);
+  color: var(--ink);
+  background: var(--pill);
+  border: 0;
+  padding: var(--pad-y) var(--pad-x);
+  resize: vertical;
+}
+
+.intake textarea::placeholder {
+  color: var(--mute);
+}
+
+.status {
+  padding: var(--row-y) var(--pad-x);
+}
+
+@container (max-width: 1100px) {
+  .i-text,
+  .m-media {
+    grid-column: 1 / span 24;
+  }
+  .i-side,
+  .m-info {
+    grid-column: 1 / span 12;
+  }
+  .card {
+    grid-column: span 12;
+  }
+}
+
+@media (max-width: 760px) {
+  .vw {
+    padding-bottom: var(--page-bottom-small);
+  }
+  .g24 {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--gap);
+  }
+  .intro {
+    padding-top: 48px;
+    margin-bottom: 32px;
+    gap: 16px;
+  }
+  .i-text h1 {
+    font-size: var(--text-display-small);
+    line-height: 1.05;
+  }
+  .mod {
+    margin-bottom: 32px;
+  }
+  .cards {
+    gap: 24px;
+  }
+  .vw-bottom {
+    left: var(--gap);
+  }
+  .vw-bottom .chip > :first-child {
+    display: none;
+  }
+}
+
+/* Two-column chapter: heading left 6 units, body right 16 */
+
+.col-left {
+  grid-column: 1 / span 6;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.col-right {
+  grid-column: 9 / span 16;
+}
+
+.chapter {
+  scroll-margin-top: 48px;
+}
+
+.entry__body {
+  padding: var(--pad-y) var(--pad-x) var(--stack);
+  max-width: var(--measure);
+  font-size: var(--text-body);
+  line-height: var(--leading-ui);
+}
+
+/* Ledger table: rows with silver rules, header in a bar, totals in a chip */
+
+.ledger {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.ledger th,
+.ledger td {
+  padding: var(--row-y) var(--pad-x);
+  text-align: left;
+  font-weight: inherit;
+  border-bottom: var(--rule-width) solid var(--rule);
+}
+
+.ledger thead th {
+  background: var(--pill);
+  border-bottom: 0;
+}
+
+.ledger tfoot th,
+.ledger tfoot td {
+  background: var(--ink);
+  color: var(--bg);
+  border-bottom: 0;
+}
+
+.ledger .num {
+  text-align: right;
+}
+
+/* Space between a right-aligned number and the text column after it */
+.ledger .num + :not(.num) {
+  padding-left: calc(var(--pad-x) * 4);
+}
+
+.ledger tr.dim a {
+  color: var(--mute);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@container (max-width: 1100px) {
+  .col-left,
+  .col-right {
+    grid-column: 1 / span 24;
+  }
+}
+
+@media (max-width: 760px) {
+  .ledger .opt {
+    display: none;
+  }
+}
+
+/* Kiosk: fullscreen exhibition screens. No navigation, large type. */
+
+.kiosk {
+  height: 100vh;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: var(--gap);
+  padding: var(--gap);
+  font-size: var(--text-kiosk);
+  line-height: var(--leading-ui);
+  cursor: none;
+}
+
+.kiosk-top {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: var(--gap);
+  padding: var(--pad-y) var(--pad-x);
+}
+
+.kiosk-top > :last-child {
+  text-align: right;
+}
+
+.kiosk-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap);
+}
+
+.kiosk-shelf {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: var(--gap);
+}
+
+.kiosk-copy {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  padding-top: 1em;
+}
+
+.kiosk-display {
+  font-size: var(--text-kiosk-display);
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+  font-weight: var(--weight-light);
+  color: var(--mute);
+  padding: 0 var(--pad-x);
+}
+
+.kiosk-display .nm {
+  color: var(--ink);
+  font-weight: var(--weight-regular);
+}
+
+.kiosk-line {
+  font-size: var(--text-kiosk-line);
+  line-height: var(--leading-line);
+  letter-spacing: var(--tracking-line);
+  font-weight: var(--weight-light);
+  padding: 0 var(--pad-x);
+}
+
+.kiosk-kv {
+  margin-top: auto;
+}
+
+.kiosk-sheet {
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--pill);
+  padding: 2vw;
+}
+
+.kiosk-sheet svg {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: 100%;
+}
+
+.kiosk-holdings {
+  min-height: 0;
+  padding-top: 1em;
+}
+
+.kiosk-ledger {
+  font-size: var(--text-kiosk-line);
+}
+
+.kiosk-ledger th,
+.kiosk-ledger td {
+  padding: 0.35em var(--pad-x);
+}

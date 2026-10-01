@@ -1,0 +1,13 @@
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+.vercel/
+
+# Local database (recreated and seeded automatically)
+data/
+
+# Secrets
+.env*.local
+.env
