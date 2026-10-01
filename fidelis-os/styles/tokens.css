@@ -22,6 +22,10 @@
 
   /* Type. Inter Tight 300 and 400 are imported in app/layout.tsx. */
   --sans: "Inter Tight", sans-serif;
+  /* Inter Tight metrics, from the font file (units per em 2048) */
+  --cap-height: 0.7275; /* capital height, 1490 / 2048 */
+  --bearing-t: 0.0244; /* space before the ink of a 400-weight "T", 50 / 2048 */
+
   --weight-light: 300;
   --weight-regular: 400;
 

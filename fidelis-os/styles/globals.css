@@ -88,22 +88,20 @@ a {
 
 .vw-logo {
   display: block;
-  padding: var(--row-y) var(--pad-x);
-  margin-left: calc(var(--pad-x) * -1);
+  /* Same box as a nav button, so the mark shares its baseline. The left edge
+     lines up with the ink of the headline's first letter ("Trust," on the home page). */
+  padding: var(--pad-y) 0 var(--pad-y) var(--pad-x);
+  line-height: var(--leading-ui);
+  --logo-nudge: calc(var(--text-display) * var(--bearing-t));
 }
 
-/* The Fidelis mark on a transparent background, as the portfolio sets its logo:
-   17.6px tall in the 12px header, so with its padding it matches the nav buttons. */
-.logo {
-  display: inline-flex;
-  align-items: center;
-  vertical-align: top;
-}
-
+/* The Fidelis mark, sized to the capitals of the type beside it and sitting on its baseline. */
 .logo img {
-  display: block;
-  height: 1.4667em;
+  display: inline-block;
+  height: calc(1em * var(--cap-height));
   width: auto;
+  margin-left: var(--logo-nudge, 0px);
+  vertical-align: baseline;
 }
 
 .vw-bottom {
@@ -407,6 +405,9 @@ button.chip:disabled {
     font-size: var(--text-display-small);
     line-height: 1.05;
   }
+  .vw-logo {
+    --logo-nudge: calc(var(--text-display-small) * var(--bearing-t));
+  }
   .mod {
     margin-bottom: 32px;
   }
@@ -531,6 +532,10 @@ button.chip:disabled {
 
 .kiosk-top > :last-child {
   text-align: right;
+}
+
+.kiosk-top .logo img {
+  --logo-nudge: calc(var(--text-kiosk-display) * var(--bearing-t));
 }
 
 .kiosk-bottom {
