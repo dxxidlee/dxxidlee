@@ -36,7 +36,7 @@ const blocks = p.blocks.map((b) => {
     </div>
     <div class="cell i-side" style={`--a:${A(19, 6, 1, 4)}`}>
       <p class="bar"><span>Details</span><span>{pad(i + 1)} / {pad(visible.length)}</span></p>
-      <dl class="kv">{spec(p).map(([k, v]) => <><dt>{k}</dt><dd>{v}</dd></>)}</dl>
+      <dl class="kv">{spec(p).map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
       {p.live && <a class="bar go" href={p.live} target="_blank" rel="noopener"><span>Visit live site</span><span>+</span></a>}
     </div>
   </section>
@@ -70,7 +70,7 @@ const blocks = p.blocks.map((b) => {
       </a>
       <div class="cell i-side" style={`--a:${A(19, 6, 1, 4)}`}>
         <p class="bar"><span>Up next</span><span>{pad(j + 1)} / {pad(visible.length)}</span></p>
-        <dl class="kv">{spec(next).map(([k, v]) => <><dt>{k}</dt><dd>{v}</dd></>)}</dl>
+        <dl class="kv">{spec(next).map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
         <a class="bar go" href={`/work/${next.slug}`}><span>View project</span><span>+</span></a>
       </div>
     </section>

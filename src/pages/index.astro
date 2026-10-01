@@ -3,11 +3,10 @@
 // Grid shows one cover per project, everything at once.
 import Base from '../layouts/Base.astro';
 import Media from '../components/Media.astro';
-import Glyph from '../components/Glyph.astro';
 import Module from '../components/Module.astro';
 import { site } from '../data/site.js';
 import { visible, inProgress, index, showDrafts } from '../data/projects.js';
-import { pad, A, layouts, glyphs, rows } from '../lib/work.js';
+import { pad, A, layouts, rows } from '../lib/work.js';
 
 const people = [...site.experience, ...site.education];
 const shortDate = (d) => (/present/i.test(d) ? 'Now' : (d.match(/\d{4}/g) || ['']).pop());
@@ -51,7 +50,7 @@ const tileStyle = (t) => (MOSAIC && mosaic[tileKey(t)] ? `--a:${mosaic[tileKey(t
 
       <section class="g24 intro">
         <div class="cell i-text" style={`--a:${A(1, 16, 1, 4)}`}>
-          <p class="bar"><span>{site.name}</span><span>{site.location}</span></p>
+          <p class="bar"><span>{site.fullName}</span><span>{site.location}</span></p>
           <h1><span class="nm">{site.name}</span> {site.positioning}</h1>
           <ul class="kv-list">{site.status.map((s) => <li>{s}</li>)}</ul>
         </div>
@@ -80,10 +79,9 @@ const tileStyle = (t) => (MOSAIC && mosaic[tileKey(t)] ? `--a:${mosaic[tileKey(t
                   <p class="bar"><span>{w.title}</span><span class="dim">{w.meta}</span></p>
                 </div>
               ))}
-              <div class="x-glyph glyph-cell"><Glyph kind="plus" /></div>
             </section>
           );
-          return <Module p={p} n={i + 1} L={layouts[i % layouts.length]} glyph={glyphs[i % glyphs.length]} id={`p-${p.slug}`} />;
+          return <Module p={p} n={i + 1} L={layouts[i % layouts.length]} id={`p-${p.slug}`} />;
         })}
       </div>
 
@@ -119,7 +117,7 @@ const tileStyle = (t) => (MOSAIC && mosaic[tileKey(t)] ? `--a:${mosaic[tileKey(t
                   <li><a href={site.resume} target="_blank">Resume</a><span>+</span></li>
                   {site.links.map((l) => <li><a href={l.href} target="_blank" rel="noopener">{l.label}</a><span>+</span></li>)}
                 </ul>
-                <span class="gt-line">{site.status[2]}</span>
+                <span class="gt-line"></span>
               </div>
             );
             return (
@@ -180,8 +178,6 @@ const tileStyle = (t) => (MOSAIC && mosaic[tileKey(t)] ? `--a:${mosaic[tileKey(t
   .x-wip1{grid-column:16 / span 5;}
   .x-blank{aspect-ratio:4/5;background:var(--pill);display:flex;align-items:flex-end;}
   .x-blank p{padding:7px;font-size:18px;line-height:1.12;letter-spacing:-.015em;font-weight:300;}
-  .x-glyph{grid-column:21 / span 4;aspect-ratio:1;}
-
   /* grid view */
   .vg{display:none;padding-bottom:calc(var(--gap) * 12);}
   .gt-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px var(--gap);}
@@ -224,8 +220,6 @@ const tileStyle = (t) => (MOSAIC && mosaic[tileKey(t)] ? `--a:${mosaic[tileKey(t
     .vw[data-view="auto"] .vg{display:block;}
 
     .inter{gap:24px;margin-bottom:32px;}
-    .x-glyph{display:none;}
-
     .gt-grid{grid-template-columns:1fr;gap:28px;}
     .gt-body.gt-list{aspect-ratio:auto;}
     .gt-soft{aspect-ratio:auto;min-height:80px;}

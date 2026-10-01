@@ -10,12 +10,11 @@ const T = (c, r) => A(c, 3, r, 2);
 
 // Project module layouts, cycled by project number.
 export const layouts = [
-  { cover: A(1, 13, 1, 8), info: A(14, 6, 1, 8), port: A(20, 5, 3, 6), thumbs: [T(5, 9), T(8, 9), T(11, 9)], glyph: A(21, 4, 10, 4) },
-  { port: A(1, 5, 1, 6), info: A(6, 6, 3, 8), cover: A(12, 13, 3, 8), thumbs: [T(12, 11), T(15, 11), T(18, 11)], glyph: A(2, 4, 8, 4) },
-  { glyph: A(2, 3, 1, 3), info: A(1, 6, 4, 8), cover: A(7, 18, 1, 11), thumbs: [T(16, 12), T(19, 12), T(22, 12)], port: A(7, 4, 12, 5) },
-  { info: A(1, 6, 1, 8), port: A(7, 5, 1, 6), cover: A(12, 13, 1, 8), thumbs: [T(12, 9), T(15, 9), T(18, 9)], glyph: A(8, 4, 8, 4) },
+  { cover: A(1, 13, 1, 8), info: A(14, 6, 1, 8), port: A(20, 5, 3, 6), thumbs: [T(5, 9), T(8, 9), T(11, 9)] },
+  { port: A(1, 5, 1, 6), info: A(6, 6, 3, 8), cover: A(12, 13, 3, 8), thumbs: [T(12, 11), T(15, 11), T(18, 11)] },
+  { info: A(1, 6, 4, 8), cover: A(7, 18, 1, 11), thumbs: [T(16, 12), T(19, 12), T(22, 12)], port: A(7, 4, 12, 5) },
+  { info: A(1, 6, 1, 8), port: A(7, 5, 1, 6), cover: A(12, 13, 1, 8), thumbs: [T(12, 9), T(15, 9), T(18, 9)] },
 ];
-export const glyphs = ['eye', 'loop', 'plus', 'mark'];
 
 export const thumbs = (p) => p.blocks
   .flatMap((b) => (b.type === 'pair' ? [b.a, b.b] : b.media ? [b.media] : []))

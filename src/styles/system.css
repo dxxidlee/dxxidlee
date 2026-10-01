@@ -7,16 +7,15 @@
 .vw .chip{display:flex;justify-content:space-between;gap:24px;background:var(--ink);color:var(--bg);padding:5px 7px;}
 .vw .dim{color:var(--mute);}
 .vw .no{display:inline-block;min-width:36px;}
-.vw .glyph{display:block;width:100%;height:100%;fill:none;stroke:var(--ink);stroke-width:1.25;}
-.vw .glyph *{vector-effect:non-scaling-stroke;}
 
 .vw-top{position:fixed;z-index:40;inset:0 0 auto 0;display:flex;justify-content:space-between;align-items:flex-start;padding:8px var(--gap);pointer-events:none;}
 .vw-top > *{pointer-events:auto;}
-.vw-logo{background:var(--bg);padding:5px 7px;margin-left:-7px;font-size:14px;letter-spacing:-.02em;}
+.vw-logo{display:block;background:var(--bg);padding:4px 7px;margin-left:-7px;}
+.vw-logo img{display:block;height:17.6px;width:auto;}
 .vw-right{display:flex;gap:var(--gap);}
 .vw-right .chip{min-width:96px;}
 .seg{display:flex;gap:1px;background:var(--bg);}
-.seg button,.seg a{all:unset;cursor:pointer;background:var(--pill);padding:5px 10px;}
+.seg button,.seg a{all:unset;cursor:url('/favicon.svg') 16 16,auto;background:var(--pill);padding:5px 10px;}
 .seg button:hover,.seg a:hover{background:var(--ph);}
 .seg button[aria-pressed="true"],.seg a[aria-current]{background:var(--ink);color:var(--bg);}
 .seg button:focus-visible,.seg a:focus-visible{outline:2px solid var(--ink);outline-offset:1px;}
@@ -28,14 +27,13 @@
 .g24{--u:calc((100cqw - 23 * var(--gap)) / 24);display:grid;grid-template-columns:repeat(24,var(--u));grid-auto-rows:var(--u);gap:var(--gap);}
 .g24 > .cell{grid-area:var(--a);min-width:0;min-height:0;}
 .cell .slot{aspect-ratio:auto;height:100%;}
-.glyph-cell{display:flex;}
 
 /* page intro: text on the left 16 units, a side column on the right 6 */
 .intro{grid-template-rows:repeat(4,minmax(var(--u),auto));padding-top:calc(var(--u) + var(--gap));margin-bottom:var(--u);}
 .i-text{display:flex;flex-direction:column;gap:14px;}
 .i-text h1,.i-text .h1{display:block;font-size:clamp(24px,3.3cqw,54px);line-height:1;letter-spacing:-.035em;font-weight:300;color:var(--mute);padding:0 7px;}
 .i-text .nm{color:var(--ink);font-weight:400;}
-.kv-list{margin:auto 0 0;padding:5px 7px;list-style:none;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);}
+.kv-list{margin:auto 0 0;padding:5px 7px;list-style:none;border-bottom:1px solid var(--rule);}
 .i-toc ol{margin:0;padding:0;list-style:none;}
 .i-toc a{display:grid;grid-template-columns:40px 1fr auto;padding:4px 7px;border-bottom:1px solid var(--rule);}
 .i-side{display:flex;flex-direction:column;gap:10px;}
@@ -55,7 +53,8 @@
 .m-cover .cap{position:absolute;z-index:1;left:0;top:0;background:var(--bg);padding:4px 7px 4px 0;}
 .m-info{display:flex;flex-direction:column;gap:10px;overflow:hidden;}
 .m-line{font-size:18px;line-height:1.12;letter-spacing:-.015em;font-weight:300;padding:0 7px;}
-.kv{display:grid;grid-template-columns:minmax(72px,38%) 1fr;column-gap:10px;row-gap:1px;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);padding:5px 7px;margin:0;}
+.kv{margin:0;}
+.kv > div{display:grid;grid-template-columns:minmax(72px,38%) 1fr;column-gap:10px;padding:4px 7px;border-bottom:1px solid var(--rule);}
 .kv dd{margin:0;}
 .m-intro{flex:1 1 0;min-height:0;overflow:hidden;padding:0 7px;-webkit-mask-image:linear-gradient(#000 calc(100% - 20px),transparent);mask-image:linear-gradient(#000 calc(100% - 20px),transparent);}
 .m-info .go{margin-top:auto;}
@@ -63,7 +62,7 @@
 
 /* expandable rows */
 .acc{border-bottom:1px solid var(--rule);}
-.acc summary{display:flex;gap:12px;padding:5px 7px;cursor:pointer;list-style:none;}
+.acc summary{display:flex;gap:12px;padding:5px 7px;list-style:none;}
 .acc summary::-webkit-details-marker{display:none;}
 .acc summary > :first-child{flex:1;}
 .acc summary::after{content:'+';}
@@ -80,7 +79,7 @@
   .mod{margin-bottom:32px;}
   .mod .cell{grid-area:auto;}
   .m-cover .slot{aspect-ratio:16/10;height:auto;}
-  .m-port,.m-thumb,.m-glyph,.m-intro{display:none;}
+  .m-port,.m-thumb,.m-intro{display:none;}
   .vw-bottom{left:var(--gap);}
-  .vw-bottom .avail,.vw-bottom .chip > :first-child{display:none;}
+  .vw-bottom .chip > :first-child{display:none;}
 }

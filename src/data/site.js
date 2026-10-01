@@ -1,15 +1,16 @@
 // Everything sitewide lives here. Edit text, not components.
 export const site = {
   name: '@dxxidlee',
+  fullName: 'David (Seungmin) Lee',
   title: '@dxxidlee',
   description: 'Designer building identity systems, interfaces, and motion, from concept to code.',
-  positioning: 'Designer building identity systems, interfaces, and motion, from concept to code.',
-  status: ['Freelance Designer, McCANN New York', 'Communication Design, Parsons, 2027', 'Available June 2027'],
+  positioning: 'designer building identity systems, interfaces, and motion, from concept to code.',
+  status: ['Freelance Designer, McCANN New York', 'BFA in Communication Design, Parsons School of Design'],
   wordmark: null,              // set to '/wordmark.svg' once you export it from Glyphs
   email: 'dxxidlee@gmail.com',
   resume: '/resume.pdf',       // drop your PDF at public/resume.pdf
   links: [
-    { label: 'LinkedIn', href: '[LINKEDIN URL]' },
+    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/dxxidlee/' },
     { label: 'Instagram', href: 'https://www.instagram.com/dxxidlee/' },
   ],
   location: 'New York',
@@ -29,7 +30,7 @@ export const site = {
       note: 'Designed exhibition labels for gallery installation, conserved garments using microscopy, and led exhibition-related design projects while managing the department\u2019s social media account.' },
   ],
   education: [
-    { org: 'Parsons School of Design at The New School', role: 'BFA in Communication Design', dates: 'Aug 2023 to May 2027 (expected)',
+    { org: 'Parsons School of Design', role: 'BFA in Communication Design', dates: 'Aug 2023 to May 2027 (expected)',
       note: 'Dean\u2019s List' },
   ],
   skills: [
