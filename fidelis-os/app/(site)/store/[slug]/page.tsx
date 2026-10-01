@@ -12,12 +12,12 @@ export const dynamic = "force-dynamic";
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const subsidiary = getStoreSubsidiaryBySlug((await params).slug);
+  const subsidiary = await getStoreSubsidiaryBySlug((await params).slug);
   return { title: subsidiary ? subsidiary.company_name : "Not found" };
 }
 
 export default async function ProductPage({ params }: Props) {
-  const subsidiary = getStoreSubsidiaryBySlug((await params).slug);
+  const subsidiary = await getStoreSubsidiaryBySlug((await params).slug);
   if (!subsidiary) notFound();
 
   return (

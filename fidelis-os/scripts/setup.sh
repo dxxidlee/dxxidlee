@@ -57,6 +57,6 @@ else
 fi
 
 say "Building the local database"
-npm run db:reset
+npm run db:init
 
 say "Done. Start the app with: npm run dev"

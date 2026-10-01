@@ -13,12 +13,12 @@ export const dynamic = "force-dynamic";
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const subsidiary = getSubsidiaryBySlug((await params).slug);
+  const subsidiary = await getSubsidiaryBySlug((await params).slug);
   return { title: subsidiary ? `${subsidiary.company_name} | Foundry` : "Not found" };
 }
 
 export default async function FoundryResultPage({ params }: Props) {
-  const subsidiary = getSubsidiaryBySlug((await params).slug);
+  const subsidiary = await getSubsidiaryBySlug((await params).slug);
   if (!subsidiary) notFound();
 
   return (

@@ -7,8 +7,8 @@ import { listStoreSubsidiaries } from "@/lib/subsidiaries";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Store" };
 
-export default function StorePage() {
-  const subsidiaries = listStoreSubsidiaries();
+export default async function StorePage() {
+  const subsidiaries = await listStoreSubsidiaries();
   const believers = subsidiaries.reduce((sum, s) => sum + s.believers, 0);
 
   return (

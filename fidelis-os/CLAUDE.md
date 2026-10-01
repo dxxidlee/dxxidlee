@@ -22,7 +22,7 @@ Go deep on Foundry. Storefront and Holdings are thinner views over the same data
 - Packaging dielines as parametric SVG (tuck-end box), export to PDF with svg2pdf.js + jsPDF. Geometry in `lib/dieline.ts` (reverse tuck end, true millimetres), drawing in `components/Dieline.tsx`. The PDF uses Helvetica because PDF viewers lack the web font
 - Deploy target: Vercel
 - Env: `ANTHROPIC_API_KEY`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
-- **v1 decision (David):** local SQLite (`better-sqlite3`, `data/fidelis.db`) instead of Supabase, so the only env var needed is `ANTHROPIC_API_KEY`. All data access goes through `lib/subsidiaries.ts` so Supabase can replace it later. Realtime in v1 means polling.
+- **v1 decision (David):** SQLite instead of Supabase. `@libsql/client` uses the local file `data/fidelis.db` in development and Turso (hosted SQLite) when `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` are set, as on Vercel (milestone 5 decision). Env for v1: `ANTHROPIC_API_KEY`, plus the two `TURSO_*` values when deployed; the Supabase vars above are not used. All data access goes through `lib/subsidiaries.ts` (async). Realtime in v1 means polling.
 
 ## Design rules (important)
 
@@ -76,7 +76,8 @@ Fill remaining fields in the same voice.
 - Never use real brand names, real companies, or real people.
 - No real dosing or real medical instructions. Products are fictional.
 - Reject hateful or harassing input with a deadpan corporate decline ("Fidelis does not manufacture this belief.").
-- Rate limit Foundry per IP.
+- Rate limit Foundry per IP: `lib/rate-limit.ts`, 6 per 10 minutes by default, hashed addresses in `foundry_requests`, `FOUNDRY_RATE_LIMIT=0` disables.
+- Input moderation before generation (`lib/foundry/moderate.ts`): a free local screen for links, emails, phone numbers and handles, then `claude-haiku-4-5` returns allow, decline, or care. Care (self-harm) shows the decline plus a 988 line instead of the bare corporate decline.
 
 ## Holdings logic (v1)
 

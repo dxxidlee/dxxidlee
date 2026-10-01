@@ -1,7 +1,7 @@
 // SQLite schema for v1. Mirrors the data model in CLAUDE.md.
 // Arrays (text[]) and packaging (jsonb) are stored as JSON text.
 // Timestamps are ISO 8601 UTC strings, so they sort and compare as text.
-import type Database from "better-sqlite3";
+import type { Client } from "@libsql/client";
 
 export const SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS subsidiaries (
@@ -35,16 +35,30 @@ CREATE TABLE IF NOT EXISTS beliefs (
 
 CREATE INDEX IF NOT EXISTS beliefs_subsidiary_created
   ON beliefs (subsidiary_id, created_at);
+
+-- Foundry requests per client, for rate limiting. Addresses are stored hashed.
+CREATE TABLE IF NOT EXISTS foundry_requests (
+  client_hash TEXT NOT NULL,
+  created_at  TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS foundry_requests_client_created
+  ON foundry_requests (client_hash, created_at);
 `;
 
-/** Creates tables and brings an older local database up to date. */
-export function applySchema(db: Database.Database): void {
-  db.exec(SCHEMA_SQL);
+/** Creates tables and brings an older database up to date. */
+export async function applySchema(db: Client): Promise<void> {
+  await db.executeMultiple(SCHEMA_SQL);
 
   // Milestone 2 added listed_at. Everything that existed before was already in the store.
-  const columns = db.prepare("PRAGMA table_info(subsidiaries)").all() as { name: string }[];
-  if (!columns.some((c) => c.name === "listed_at")) {
-    db.exec("ALTER TABLE subsidiaries ADD COLUMN listed_at TEXT");
-    db.exec("UPDATE subsidiaries SET listed_at = created_at");
+  const columns = await db.execute("PRAGMA table_info(subsidiaries)");
+  if (!columns.rows.some((c) => c.name === "listed_at")) {
+    await db.batch(
+      [
+        "ALTER TABLE subsidiaries ADD COLUMN listed_at TEXT",
+        "UPDATE subsidiaries SET listed_at = created_at",
+      ],
+      "write",
+    );
   }
 }

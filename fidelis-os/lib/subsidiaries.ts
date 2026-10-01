@@ -1,7 +1,7 @@
 import "server-only";
 import { randomUUID } from "node:crypto";
 import { getDb } from "./db";
-import { fromRow, insertSubsidiary, type SubsidiaryRow } from "./rows";
+import { fromRow, insertSubsidiary, rowsOf, type SubsidiaryRow } from "./rows";
 import type { Holding, HoldingsReport, NewSubsidiary, Subsidiary } from "./types";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -27,64 +27,66 @@ const SELECT = `SELECT s.*, ${EFFECTIVE_STATUS} AS effective_status FROM subsidi
 const cutoff = () => new Date(Date.now() - DISCONTINUE_AFTER_DAYS * DAY_MS).toISOString();
 
 /** Every listed, active subsidiary for the Storefront: flagships first, then newest. */
-export function listStoreSubsidiaries(): Subsidiary[] {
-  const rows = getDb()
-    .prepare(
-      `SELECT * FROM (${SELECT})
-       WHERE effective_status = 'active' AND listed_at IS NOT NULL
-       ORDER BY is_flagship DESC, listed_at DESC`,
-    )
-    .all({ cutoff: cutoff() }) as SubsidiaryRow[];
-  return rows.map(fromRow);
+export async function listStoreSubsidiaries(): Promise<Subsidiary[]> {
+  const rs = await (await getDb()).execute({
+    sql: `SELECT * FROM (${SELECT})
+          WHERE effective_status = 'active' AND listed_at IS NOT NULL
+          ORDER BY is_flagship DESC, listed_at DESC`,
+    args: { cutoff: cutoff() },
+  });
+  return rowsOf<SubsidiaryRow>(rs).map(fromRow);
 }
 
 /** Every subsidiary Fidelis holds, listed or not, ranked by believers. */
-export function listAllSubsidiaries(): Subsidiary[] {
-  const rows = getDb()
-    .prepare(`${SELECT} ORDER BY s.believers DESC, s.created_at ASC`)
-    .all({ cutoff: cutoff() }) as SubsidiaryRow[];
-  return rows.map(fromRow);
+export async function listAllSubsidiaries(): Promise<Subsidiary[]> {
+  const rs = await (await getDb()).execute({
+    sql: `${SELECT} ORDER BY s.believers DESC, s.created_at ASC`,
+    args: { cutoff: cutoff() },
+  });
+  return rowsOf<SubsidiaryRow>(rs).map(fromRow);
 }
 
 /** Any subsidiary, listed or not. */
-export function getSubsidiaryBySlug(slug: string): Subsidiary | null {
-  const row = getDb()
-    .prepare(`${SELECT} WHERE s.slug = @slug`)
-    .get({ slug, cutoff: cutoff() }) as SubsidiaryRow | undefined;
+export async function getSubsidiaryBySlug(slug: string): Promise<Subsidiary | null> {
+  const rs = await (await getDb()).execute({
+    sql: `${SELECT} WHERE s.slug = @slug`,
+    args: { slug, cutoff: cutoff() },
+  });
+  const row = rowsOf<SubsidiaryRow>(rs)[0];
   return row ? fromRow(row) : null;
 }
 
 /** Only subsidiaries that have been listed in the Store. */
-export function getStoreSubsidiaryBySlug(slug: string): Subsidiary | null {
-  const subsidiary = getSubsidiaryBySlug(slug);
+export async function getStoreSubsidiaryBySlug(slug: string): Promise<Subsidiary | null> {
+  const subsidiary = await getSubsidiaryBySlug(slug);
   return subsidiary?.listed_at ? subsidiary : null;
 }
 
 /** Names already in the portfolio, so the Foundry does not found a duplicate. */
-export function listCompanyNames(): string[] {
-  const rows = getDb()
-    .prepare("SELECT DISTINCT company_name FROM subsidiaries ORDER BY company_name")
-    .all() as { company_name: string }[];
-  return rows.map((r) => r.company_name);
+export async function listCompanyNames(): Promise<string[]> {
+  const rs = await (await getDb()).execute(
+    "SELECT DISTINCT company_name FROM subsidiaries ORDER BY company_name",
+  );
+  return rowsOf<{ company_name: string }>(rs).map((r) => r.company_name);
 }
 
 /** The portfolio: every subsidiary ranked by believers, with the last 24 hours of beliefs. */
-export function getHoldings(): HoldingsReport {
+export async function getHoldings(): Promise<HoldingsReport> {
   const now = new Date();
-  const rows = getDb()
-    .prepare(
-      `SELECT s.slug, s.company_name, s.product_name, s.category, s.believers,
-              s.created_at, s.listed_at,
-              ${EFFECTIVE_STATUS} AS status,
-              (SELECT COUNT(*) FROM beliefs b
-               WHERE b.subsidiary_id = s.id AND b.created_at >= @since) AS delta_24h
-       FROM subsidiaries s
-       ORDER BY s.believers DESC, s.created_at ASC`,
-    )
-    .all({
+  const rs = await (await getDb()).execute({
+    sql: `SELECT s.slug, s.company_name, s.product_name, s.category, s.believers,
+                 s.created_at, s.listed_at,
+                 ${EFFECTIVE_STATUS} AS status,
+                 (SELECT COUNT(*) FROM beliefs b
+                  WHERE b.subsidiary_id = s.id AND b.created_at >= @since) AS delta_24h
+          FROM subsidiaries s
+          ORDER BY s.believers DESC, s.created_at ASC`,
+    args: {
       cutoff: cutoff(),
       since: new Date(now.getTime() - DAY_MS).toISOString(),
-    }) as (Omit<Holding, "rank" | "listed"> & { listed_at: string | null })[];
+    },
+  });
+  const rows = rowsOf<Omit<Holding, "rank" | "listed"> & { listed_at: string | null }>(rs);
 
   const holdings = rows.map(({ listed_at, ...row }, i) => ({
     ...row,
@@ -104,50 +106,54 @@ export function getHoldings(): HoldingsReport {
 }
 
 /** Founds a new, unlisted subsidiary from Foundry output. */
-export function createSubsidiary(input: NewSubsidiary): Subsidiary {
-  const db = getDb();
-  return db.transaction(() => insertSubsidiary(db, input)).immediate();
+export async function createSubsidiary(input: NewSubsidiary): Promise<Subsidiary> {
+  const tx = await (await getDb()).transaction("write");
+  try {
+    const subsidiary = await insertSubsidiary(tx, input);
+    await tx.commit();
+    return subsidiary;
+  } finally {
+    tx.close();
+  }
 }
 
 /**
  * Lists a subsidiary in the Store. Listing twice keeps the first date.
  * Returns null if the subsidiary does not exist.
  */
-export function listInStore(slug: string): string | null {
-  const row = getDb()
-    .prepare(
-      `UPDATE subsidiaries SET listed_at = COALESCE(listed_at, ?)
-       WHERE slug = ? RETURNING listed_at`,
-    )
-    .get(new Date().toISOString(), slug) as { listed_at: string } | undefined;
-  return row?.listed_at ?? null;
+export async function listInStore(slug: string): Promise<string | null> {
+  const rs = await (await getDb()).execute({
+    sql: `UPDATE subsidiaries SET listed_at = COALESCE(listed_at, @now)
+          WHERE slug = @slug RETURNING listed_at`,
+    args: { now: new Date().toISOString(), slug },
+  });
+  return rowsOf<{ listed_at: string }>(rs)[0]?.listed_at ?? null;
 }
 
 /**
  * Records one purchase (a belief) and returns the new believer count.
  * Returns null unless the subsidiary is listed and, after discontinuation, still active.
  */
-export function recordBelief(slug: string): number | null {
-  const db = getDb();
-  const believe = db.transaction((): number | null => {
-    const subsidiary = db
-      .prepare(
-        `SELECT id FROM (${SELECT})
-         WHERE slug = @slug AND effective_status = 'active' AND listed_at IS NOT NULL`,
-      )
-      .get({ slug, cutoff: cutoff() }) as { id: string } | undefined;
-    if (!subsidiary) return null;
-
-    db.prepare(
-      "INSERT INTO beliefs (id, subsidiary_id, created_at) VALUES (?, ?, ?)",
-    ).run(randomUUID(), subsidiary.id, new Date().toISOString());
-
-    const { believers } = db
-      .prepare(
-        "UPDATE subsidiaries SET believers = believers + 1 WHERE id = ? RETURNING believers",
-      )
-      .get(subsidiary.id) as { believers: number };
-    return believers;
-  });
-  return believe.immediate();
+export async function recordBelief(slug: string): Promise<number | null> {
+  // One atomic batch: the insert only happens for an eligible subsidiary, and the
+  // count is then recomputed from the beliefs themselves.
+  const [inserted, updated] = await (await getDb()).batch(
+    [
+      {
+        sql: `INSERT INTO beliefs (id, subsidiary_id, created_at)
+              SELECT @id, id, @now FROM (${SELECT})
+              WHERE slug = @slug AND effective_status = 'active' AND listed_at IS NOT NULL`,
+        args: { id: randomUUID(), now: new Date().toISOString(), slug, cutoff: cutoff() },
+      },
+      {
+        sql: `UPDATE subsidiaries
+              SET believers = (SELECT COUNT(*) FROM beliefs WHERE subsidiary_id = subsidiaries.id)
+              WHERE slug = @slug RETURNING believers`,
+        args: { slug },
+      },
+    ],
+    "write",
+  );
+  if (inserted.rowsAffected === 0) return null;
+  return Number(updated.rows[0].believers);
 }

@@ -11,8 +11,8 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Trust Manual" };
 
 /** Every subsidiary's manual entry, filed under each trust device it uses. */
-export default function TrustManualPage() {
-  const subsidiaries = listAllSubsidiaries();
+export default async function TrustManualPage() {
+  const subsidiaries = await listAllSubsidiaries();
   const chapters = TRUST_DEVICES.map((device) => ({
     device,
     entries: subsidiaries.filter((s) => s.trust_devices.includes(device)),

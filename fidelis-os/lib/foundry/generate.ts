@@ -1,5 +1,5 @@
 import "server-only";
-import Anthropic from "@anthropic-ai/sdk";
+import { FoundryError, getAnthropic, toFoundryError } from "./anthropic";
 import { jsonOutputFormat } from "./json-schema";
 import { SYSTEM_PROMPT, userMessage } from "./prompt";
 import { FoundryOutputSchema, type FoundryDraft } from "./schema";
@@ -10,38 +10,14 @@ export type GenerationResult =
   | { kind: "manufactured"; draft: FoundryDraft }
   | { kind: "declined" };
 
-/** Raised for failures the intake should report, with a status code for the route. */
-export class FoundryError extends Error {
-  constructor(
-    message: string,
-    readonly status: number,
-  ) {
-    super(message);
-  }
-}
-
 const OUTPUT_FORMAT = jsonOutputFormat(FoundryOutputSchema);
-
-let client: Anthropic | null = null;
-
-function getClient(): Anthropic {
-  const apiKey = process.env.ANTHROPIC_API_KEY?.trim();
-  if (!apiKey || apiKey === "paste-your-key-here") {
-    throw new FoundryError(
-      "The Foundry is offline. ANTHROPIC_API_KEY is not set in .env.local.",
-      503,
-    );
-  }
-  client ??= new Anthropic({ apiKey });
-  return client;
-}
 
 type Attempt =
   | GenerationResult
   | { kind: "invalid"; reason: string };
 
 async function attempt(desire: string, existingNames: string[]): Promise<Attempt> {
-  const response = await getClient().messages.create({
+  const response = await getAnthropic().messages.create({
     model: MODEL,
     max_tokens: 16000,
     output_config: { effort: "medium", format: OUTPUT_FORMAT },
@@ -95,21 +71,7 @@ export async function generateSubsidiary(
       console.warn(`[foundry] attempt ${i} failed validation: ${result.reason}`);
     }
   } catch (error) {
-    if (error instanceof FoundryError) throw error;
-    if (error instanceof Anthropic.AuthenticationError) {
-      throw new FoundryError(
-        "The Foundry is offline. ANTHROPIC_API_KEY was rejected.",
-        503,
-      );
-    }
-    if (error instanceof Anthropic.RateLimitError) {
-      throw new FoundryError("The Foundry is at capacity. Try again shortly.", 503);
-    }
-    if (error instanceof Anthropic.APIError) {
-      console.error(`[foundry] API error ${error.status}:`, error.message);
-      throw new FoundryError("The Foundry could not complete this order.", 502);
-    }
-    throw error;
+    toFoundryError(error);
   }
   throw new FoundryError("The Foundry could not complete this order.", 502);
 }

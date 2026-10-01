@@ -1,4 +1,4 @@
-import type Database from "better-sqlite3";
+import type { Client } from "@libsql/client";
 import { randomUUID } from "node:crypto";
 import { insertSubsidiary } from "./rows";
 import type { NewSubsidiary } from "./types";
@@ -199,34 +199,47 @@ function mulberry32(seed: number) {
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+const BELIEF_CHUNK = 200;
+
 /** Seeds the flagships and their belief history, but only into an empty database. */
-export function seedIfEmpty(db: Database.Database): void {
-  const run = db.transaction(() => {
-    const { n } = db.prepare("SELECT COUNT(*) AS n FROM subsidiaries").get() as {
-      n: number;
-    };
-    if (n > 0) return;
+export async function seedIfEmpty(db: Client): Promise<void> {
+  // A write transaction, so two processes starting at once cannot both seed.
+  const tx = await db.transaction("write");
+  try {
+    const rs = await tx.execute("SELECT COUNT(*) AS n FROM subsidiaries");
+    if (Number(rs.rows[0].n) > 0) {
+      await tx.rollback();
+      return;
+    }
 
     const now = Date.now();
     const random = mulberry32(1);
-    const insertBelief = db.prepare(
-      "INSERT INTO beliefs (id, subsidiary_id, created_at) VALUES (?, ?, ?)",
-    );
 
     for (const flagship of FLAGSHIPS) {
       const founded = now - flagship.founded_days_ago * DAY_MS;
-      const subsidiary = insertSubsidiary(db, flagship.subsidiary, {
+      const subsidiary = await insertSubsidiary(tx, flagship.subsidiary, {
         believers: flagship.believers,
         created_at: new Date(founded).toISOString(),
         listed_at: new Date(founded).toISOString(),
       });
+
       // Spread belief timestamps between founding and now, weighted toward recent.
-      for (let i = 0; i < flagship.believers; i++) {
+      const beliefs = Array.from({ length: flagship.believers }, () => {
         const t = founded + Math.sqrt(random()) * (now - founded);
-        insertBelief.run(randomUUID(), subsidiary.id, new Date(t).toISOString());
+        return [randomUUID(), subsidiary.id, new Date(t).toISOString()];
+      });
+      for (let i = 0; i < beliefs.length; i += BELIEF_CHUNK) {
+        const chunk = beliefs.slice(i, i + BELIEF_CHUNK);
+        await tx.execute({
+          sql: `INSERT INTO beliefs (id, subsidiary_id, created_at) VALUES ${chunk
+            .map(() => "(?, ?, ?)")
+            .join(", ")}`,
+          args: chunk.flat(),
+        });
       }
     }
-  });
-  // IMMEDIATE takes the write lock up front, so parallel workers cannot both seed.
-  run.immediate();
+    await tx.commit();
+  } finally {
+    tx.close();
+  }
 }

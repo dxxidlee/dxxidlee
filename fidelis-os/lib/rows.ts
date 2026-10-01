@@ -1,8 +1,14 @@
 // Conversion between SQLite rows and Subsidiary objects.
 // Kept free of "server-only" so scripts can use it too.
-import type Database from "better-sqlite3";
+import type { Client, ResultSet, Transaction } from "@libsql/client";
 import { randomUUID } from "node:crypto";
 import { SubsidiarySchema, type NewSubsidiary, type Subsidiary } from "./types";
+
+/** Anything that can run a statement: the client or an open transaction. */
+export type Executor = Client | Transaction;
+
+/** Result rows as plain objects of the expected shape. */
+export const rowsOf = <T>(rs: ResultSet) => rs.rows as unknown as T[];
 
 export type SubsidiaryRow = {
   id: string;
@@ -54,25 +60,29 @@ export function slugify(text: string): string {
 }
 
 /** Returns a slug not yet used by any subsidiary: "quiet", "quiet-2", ... */
-export function uniqueSlug(db: Database.Database, base: string): string {
+export async function uniqueSlug(db: Executor, base: string): Promise<string> {
   const root = slugify(base);
-  const taken = db.prepare("SELECT 1 FROM subsidiaries WHERE slug = ?");
+  const rs = await db.execute({
+    sql: "SELECT slug FROM subsidiaries WHERE slug = ? OR slug LIKE ?",
+    args: [root, `${root}-%`],
+  });
+  const taken = new Set(rowsOf<{ slug: string }>(rs).map((r) => r.slug));
   let slug = root;
-  for (let n = 2; taken.get(slug); n++) slug = `${root}-${n}`;
+  for (let n = 2; taken.has(slug); n++) slug = `${root}-${n}`;
   return slug;
 }
 
-export function insertSubsidiary(
-  db: Database.Database,
+export async function insertSubsidiary(
+  db: Executor,
   input: NewSubsidiary,
   options: { believers?: number; created_at?: string; listed_at?: string | null } = {},
-): Subsidiary {
+): Promise<Subsidiary> {
   const id = randomUUID();
-  const slug = uniqueSlug(db, input.company_name);
+  const slug = await uniqueSlug(db, input.company_name);
   const created_at = options.created_at ?? new Date().toISOString();
 
-  db.prepare(
-    `INSERT INTO subsidiaries (
+  await db.execute({
+    sql: `INSERT INTO subsidiaries (
       id, slug, created_at, desire, category, company_name, product_name,
       tagline, claim, format, active_ingredients, side_effects, price_cents,
       trust_devices, manual_entry, packaging, believers, status, is_flagship,
@@ -83,31 +93,30 @@ export function insertSubsidiary(
       @trust_devices, @manual_entry, @packaging, @believers, @status, @is_flagship,
       @listed_at
     )`,
-  ).run({
-    id,
-    slug,
-    created_at,
-    desire: input.desire,
-    category: input.category,
-    company_name: input.company_name,
-    product_name: input.product_name,
-    tagline: input.tagline,
-    claim: input.claim,
-    format: input.format,
-    active_ingredients: JSON.stringify(input.active_ingredients),
-    side_effects: JSON.stringify(input.side_effects),
-    price_cents: input.price_cents,
-    trust_devices: JSON.stringify(input.trust_devices),
-    manual_entry: input.manual_entry,
-    packaging: JSON.stringify(input.packaging),
-    believers: options.believers ?? 0,
-    status: input.status ?? "active",
-    is_flagship: input.is_flagship ? 1 : 0,
-    listed_at: options.listed_at ?? null,
+    args: {
+      id,
+      slug,
+      created_at,
+      desire: input.desire,
+      category: input.category,
+      company_name: input.company_name,
+      product_name: input.product_name,
+      tagline: input.tagline,
+      claim: input.claim,
+      format: input.format,
+      active_ingredients: JSON.stringify(input.active_ingredients),
+      side_effects: JSON.stringify(input.side_effects),
+      price_cents: input.price_cents,
+      trust_devices: JSON.stringify(input.trust_devices),
+      manual_entry: input.manual_entry,
+      packaging: JSON.stringify(input.packaging),
+      believers: options.believers ?? 0,
+      status: input.status ?? "active",
+      is_flagship: input.is_flagship ? 1 : 0,
+      listed_at: options.listed_at ?? null,
+    },
   });
 
-  const row = db
-    .prepare("SELECT * FROM subsidiaries WHERE id = ?")
-    .get(id) as SubsidiaryRow;
-  return fromRow(row);
+  const rs = await db.execute({ sql: "SELECT * FROM subsidiaries WHERE id = ?", args: [id] });
+  return fromRow(rowsOf<SubsidiaryRow>(rs)[0]);
 }

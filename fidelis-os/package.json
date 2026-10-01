@@ -11,12 +11,13 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "db:reset": "tsx scripts/db-reset.ts"
+    "db:reset": "tsx scripts/db-reset.ts --reset",
+    "db:init": "tsx scripts/db-reset.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",
     "@fontsource/inter-tight": "^5.3.0",
-    "better-sqlite3": "^12.11.1",
+    "@libsql/client": "^0.18.0",
     "jspdf": "^4.2.1",
     "next": "^16.3.8",
     "react": "^19.3.0",
@@ -26,7 +27,6 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^9.6.0",
     "@types/node": "^22.20.4",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",

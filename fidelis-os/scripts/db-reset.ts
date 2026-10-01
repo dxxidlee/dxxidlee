@@ -1,27 +1,52 @@
-// Deletes the local SQLite database and recreates it with the flagship seed.
-// Usage: npm run db:reset
-import Database from "better-sqlite3";
+// Usage:
+//   npm run db:init                   create tables and seed the flagships if empty (safe)
+//   npm run db:reset                  delete the local database and reseed
+//   npm run db:reset -- --remote      wipe the Turso database named in TURSO_DATABASE_URL and reseed
+import { loadEnvConfig } from "@next/env";
 import fs from "node:fs";
-import path from "node:path";
-import { applySchema } from "../lib/schema";
-import { seedIfEmpty } from "../lib/seed";
+import { connect, databaseUrl, initDatabase, isLocalFile } from "../lib/database";
 
-const file =
-  process.env.DATABASE_PATH ?? path.join(process.cwd(), "data", "fidelis.db");
+// Read .env.local and friends the same way Next does, so TURSO_* settings apply here too.
+loadEnvConfig(process.cwd());
 
-for (const suffix of ["", "-wal", "-shm"]) fs.rmSync(file + suffix, { force: true });
-fs.mkdirSync(path.dirname(file), { recursive: true });
+const reset = process.argv.includes("--reset");
+const remote = process.argv.includes("--remote");
+const url = databaseUrl();
 
-const db = new Database(file);
-db.pragma("journal_mode = WAL");
-db.pragma("foreign_keys = ON");
-applySchema(db);
-seedIfEmpty(db);
+async function main() {
+  if (reset && !isLocalFile(url) && !remote) {
+    console.error(
+      `Refusing to wipe the remote database at ${url}.\n` +
+        "Run with --remote to confirm: npm run db:reset -- --remote",
+    );
+    process.exit(1);
+  }
 
-const rows = db
-  .prepare("SELECT company_name, believers FROM subsidiaries ORDER BY believers DESC")
-  .all() as { company_name: string; believers: number }[];
-db.close();
+  if (reset && isLocalFile(url)) {
+    const file = url.slice("file:".length);
+    for (const suffix of ["", "-wal", "-shm"]) fs.rmSync(file + suffix, { force: true });
+  }
 
-console.log(`Database reset: ${file}`);
-for (const r of rows) console.log(`  ${r.company_name.padEnd(12)} ${r.believers}`);
+  const db = await connect();
+
+  if (reset && !isLocalFile(url)) {
+    await db.batch(
+      ["DROP TABLE IF EXISTS beliefs", "DROP TABLE IF EXISTS foundry_requests", "DROP TABLE IF EXISTS subsidiaries"],
+      "write",
+    );
+  }
+
+  await initDatabase(db);
+
+  const rs = await db.execute(
+    "SELECT company_name, believers FROM subsidiaries ORDER BY believers DESC",
+  );
+  console.log(`${reset ? "Database reset" : "Database ready"}: ${url}`);
+  for (const r of rs.rows) console.log(`  ${String(r.company_name).padEnd(12)} ${r.believers}`);
+  db.close();
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});

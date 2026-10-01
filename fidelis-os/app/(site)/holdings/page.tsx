@@ -7,8 +7,8 @@ import { DISCONTINUE_AFTER_DAYS, getHoldings } from "@/lib/subsidiaries";
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Holdings" };
 
-export default function HoldingsPage() {
-  const report = getHoldings();
+export default async function HoldingsPage() {
+  const report = await getHoldings();
 
   return (
     <>
