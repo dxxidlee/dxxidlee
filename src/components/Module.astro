@@ -7,7 +7,6 @@ const href = `/work/${p.slug}`;
 ---
 <section class="g24 mod" id={id}>
   <a class="cell m-cover" href={href} style={`--a:${L.cover}`}>
-    <span class="cap">{p.title}, {p.year}</span>
     <Media media={p.cover} ratio="l" />
   </a>
   <a class="cell m-port" href={href} style={`--a:${L.port}`} tabindex="-1" aria-hidden="true"><Media media={p.portrait} ratio="p" /></a>

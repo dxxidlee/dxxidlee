@@ -4,7 +4,6 @@
 import Base from '../../layouts/Base.astro';
 import Media from '../../components/Media.astro';
 import { visible } from '../../data/projects.js';
-import { site } from '../../data/site.js';
 import { pad, A, spec } from '../../lib/work.js';
 
 export function getStaticPaths() {
@@ -28,7 +27,7 @@ const blocks = p.blocks.map((b) => {
   return { fig, caption: b.caption, cap: A(1, 16, 16, 1), cells: [{ media: b.media, ratio, a: A(1, 24, 1, 15) }] };
 });
 ---
-<Base title={`${p.title}, ${site.name}`} description={p.line} nav="work">
+<Base description={p.line} nav="work">
   <section class="g24 intro">
     <div class="cell i-text" style={`--a:${A(1, 16, 1, 4)}`}>
       <p class="bar"><span><span class="no">{pad(i + 1)}</span>Case study</span><span>{p.tags}</span></p>

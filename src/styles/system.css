@@ -33,7 +33,7 @@
 .i-text{display:flex;flex-direction:column;gap:14px;}
 .i-text h1,.i-text .h1{display:block;font-size:clamp(24px,3.3cqw,54px);line-height:1;letter-spacing:-.035em;font-weight:300;color:var(--mute);padding:0 7px;}
 .i-text .nm{color:var(--ink);font-weight:400;}
-.kv-list{margin:auto 0 0;padding:5px 7px;list-style:none;border-bottom:1px solid var(--rule);}
+.bars{display:flex;flex-direction:column;gap:var(--gap);}
 .i-toc ol{margin:0;padding:0;list-style:none;}
 .i-toc a{display:grid;grid-template-columns:40px 1fr auto;padding:4px 7px;border-bottom:1px solid var(--rule);}
 .i-side{display:flex;flex-direction:column;gap:10px;}
@@ -50,7 +50,6 @@
 /* project module */
 .mod{margin-bottom:calc(var(--u) * 2);scroll-margin-top:48px;}
 .m-cover,.m-port{position:relative;display:block;}
-.m-cover .cap{position:absolute;z-index:1;left:0;top:0;background:var(--bg);padding:4px 7px 4px 0;}
 .m-info{display:flex;flex-direction:column;gap:10px;overflow:hidden;}
 .m-line{font-size:18px;line-height:1.12;letter-spacing:-.015em;font-weight:300;padding:0 7px;}
 .kv{margin:0;}
