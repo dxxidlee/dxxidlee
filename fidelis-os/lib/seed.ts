@@ -218,6 +218,7 @@ export function seedIfEmpty(db: Database.Database): void {
       const subsidiary = insertSubsidiary(db, flagship.subsidiary, {
         believers: flagship.believers,
         created_at: new Date(founded).toISOString(),
+        listed_at: new Date(founded).toISOString(),
       });
       // Spread belief timestamps between founding and now, weighted toward recent.
       for (let i = 0; i < flagship.believers; i++) {

@@ -16,6 +16,19 @@ key into `.env.local` (needed from milestone 2 on).
 
     npm run dev        # http://localhost:3000
 
+## Foundry
+
+`/foundry` takes a desire, calls Claude (`claude-sonnet-5-5`) from
+`app/api/foundry/route.ts`, validates the JSON with zod (one retry), saves the
+subsidiary unlisted, and opens its record at `/foundry/[slug]`. "List in store"
+puts it in `/store`.
+
+- Prompt and house voice: `lib/foundry/prompt.ts` (the flagships are its examples)
+- Output schema and limits: `lib/foundry/schema.ts`
+- API call, retry, decline handling: `lib/foundry/generate.ts`
+
+Needs `ANTHROPIC_API_KEY` in `.env.local`. Restart `npm run dev` after editing it.
+
 ## Database (v1)
 
 Local SQLite at `data/fidelis.db`. It is created and seeded with the four

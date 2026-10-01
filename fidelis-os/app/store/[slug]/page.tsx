@@ -2,19 +2,19 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { BelieveButton } from "@/components/BelieveButton";
 import { formatDate, formatPrice } from "@/lib/format";
-import { getSubsidiaryBySlug } from "@/lib/subsidiaries";
+import { getStoreSubsidiaryBySlug } from "@/lib/subsidiaries";
 
 export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const subsidiary = getSubsidiaryBySlug((await params).slug);
+  const subsidiary = getStoreSubsidiaryBySlug((await params).slug);
   return { title: subsidiary ? subsidiary.company_name : "Not found" };
 }
 
 export default async function ProductPage({ params }: Props) {
-  const subsidiary = getSubsidiaryBySlug((await params).slug);
+  const subsidiary = getStoreSubsidiaryBySlug((await params).slug);
   if (!subsidiary) notFound();
 
   return (

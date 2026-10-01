@@ -24,6 +24,7 @@ export type SubsidiaryRow = {
   believers: number;
   status: string;
   is_flagship: number;
+  listed_at: string | null;
 };
 
 export function fromRow(row: SubsidiaryRow): Subsidiary {
@@ -61,7 +62,7 @@ export function uniqueSlug(db: Database.Database, base: string): string {
 export function insertSubsidiary(
   db: Database.Database,
   input: NewSubsidiary,
-  options: { believers?: number; created_at?: string } = {},
+  options: { believers?: number; created_at?: string; listed_at?: string | null } = {},
 ): Subsidiary {
   const id = randomUUID();
   const slug = uniqueSlug(db, input.company_name);
@@ -71,11 +72,13 @@ export function insertSubsidiary(
     `INSERT INTO subsidiaries (
       id, slug, created_at, desire, category, company_name, product_name,
       tagline, claim, format, active_ingredients, side_effects, price_cents,
-      trust_devices, manual_entry, packaging, believers, status, is_flagship
+      trust_devices, manual_entry, packaging, believers, status, is_flagship,
+      listed_at
     ) VALUES (
       @id, @slug, @created_at, @desire, @category, @company_name, @product_name,
       @tagline, @claim, @format, @active_ingredients, @side_effects, @price_cents,
-      @trust_devices, @manual_entry, @packaging, @believers, @status, @is_flagship
+      @trust_devices, @manual_entry, @packaging, @believers, @status, @is_flagship,
+      @listed_at
     )`,
   ).run({
     id,
@@ -97,6 +100,7 @@ export function insertSubsidiary(
     believers: options.believers ?? 0,
     status: input.status ?? "active",
     is_flagship: input.is_flagship ? 1 : 0,
+    listed_at: options.listed_at ?? null,
   });
 
   const row = db

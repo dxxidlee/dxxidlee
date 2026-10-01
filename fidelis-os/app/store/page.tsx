@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { SubsidiaryCard } from "@/components/SubsidiaryCard";
-import { listActiveSubsidiaries } from "@/lib/subsidiaries";
+import { listStoreSubsidiaries } from "@/lib/subsidiaries";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Store" };
 
 export default function StorePage() {
-  const subsidiaries = listActiveSubsidiaries();
+  const subsidiaries = listStoreSubsidiaries();
 
   return (
     <section>

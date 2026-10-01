@@ -3,7 +3,7 @@
 import Database from "better-sqlite3";
 import fs from "node:fs";
 import path from "node:path";
-import { SCHEMA_SQL } from "../lib/schema";
+import { applySchema } from "../lib/schema";
 import { seedIfEmpty } from "../lib/seed";
 
 const file =
@@ -15,7 +15,7 @@ fs.mkdirSync(path.dirname(file), { recursive: true });
 const db = new Database(file);
 db.pragma("journal_mode = WAL");
 db.pragma("foreign_keys = ON");
-db.exec(SCHEMA_SQL);
+applySchema(db);
 seedIfEmpty(db);
 
 const rows = db

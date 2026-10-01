@@ -47,6 +47,7 @@ David will redesign everything afterward. Build structure, not style.
 - believers (int, default 0)
 - status (active | merged | acquired | discontinued)
 - is_flagship (bool)
+- listed_at (timestamp, null until "List in store"; added in milestone 2. The Store shows only listed subsidiaries; Holdings shows all)
 
 `beliefs` (purchases): id, subsidiary_id, created_at
 

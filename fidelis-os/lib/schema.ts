@@ -1,6 +1,7 @@
 // SQLite schema for v1. Mirrors the data model in CLAUDE.md.
 // Arrays (text[]) and packaging (jsonb) are stored as JSON text.
 // Timestamps are ISO 8601 UTC strings, so they sort and compare as text.
+import type Database from "better-sqlite3";
 
 export const SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS subsidiaries (
@@ -22,7 +23,8 @@ CREATE TABLE IF NOT EXISTS subsidiaries (
   packaging          TEXT NOT NULL,
   believers          INTEGER NOT NULL DEFAULT 0 CHECK (believers >= 0),
   status             TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'merged', 'acquired', 'discontinued')),
-  is_flagship        INTEGER NOT NULL DEFAULT 0 CHECK (is_flagship IN (0, 1))
+  is_flagship        INTEGER NOT NULL DEFAULT 0 CHECK (is_flagship IN (0, 1)),
+  listed_at          TEXT
 );
 
 CREATE TABLE IF NOT EXISTS beliefs (
@@ -34,3 +36,15 @@ CREATE TABLE IF NOT EXISTS beliefs (
 CREATE INDEX IF NOT EXISTS beliefs_subsidiary_created
   ON beliefs (subsidiary_id, created_at);
 `;
+
+/** Creates tables and brings an older local database up to date. */
+export function applySchema(db: Database.Database): void {
+  db.exec(SCHEMA_SQL);
+
+  // Milestone 2 added listed_at. Everything that existed before was already in the store.
+  const columns = db.prepare("PRAGMA table_info(subsidiaries)").all() as { name: string }[];
+  if (!columns.some((c) => c.name === "listed_at")) {
+    db.exec("ALTER TABLE subsidiaries ADD COLUMN listed_at TEXT");
+    db.exec("UPDATE subsidiaries SET listed_at = created_at");
+  }
+}

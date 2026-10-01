@@ -63,6 +63,8 @@ export const SubsidiarySchema = z.object({
   believers: z.number().int().nonnegative(),
   status: StatusSchema,
   is_flagship: z.boolean(),
+  /** When the subsidiary was listed in the Store. Null until then. */
+  listed_at: z.string().nullable(),
 });
 
 export type Category = z.infer<typeof CategorySchema>;
@@ -74,7 +76,7 @@ export type Subsidiary = z.infer<typeof SubsidiarySchema>;
 /** Fields supplied when founding a subsidiary. The rest are assigned by the database. */
 export type NewSubsidiary = Omit<
   Subsidiary,
-  "id" | "slug" | "created_at" | "believers" | "status"
+  "id" | "slug" | "created_at" | "believers" | "status" | "listed_at"
 > & {
   status?: Status;
 };

@@ -207,3 +207,95 @@ button:disabled {
   align-items: center;
   gap: var(--space-3);
 }
+
+/* Shared definition list: label column, value column */
+
+.facts {
+  display: grid;
+  grid-template-columns: minmax(8rem, max-content) 1fr;
+  gap: var(--space-2) var(--space-4);
+}
+
+.facts dt {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  color: var(--color-muted);
+  padding-top: 0.2em;
+}
+
+.facts ul {
+  list-style: none;
+  padding: 0;
+}
+
+.facts__row {
+  display: contents;
+}
+
+/* Foundry */
+
+.foundry-intake__form {
+  display: grid;
+  gap: var(--space-4);
+  max-width: var(--measure);
+}
+
+.foundry-intake textarea {
+  font: inherit;
+  font-size: var(--text-lg);
+  color: var(--color-fg);
+  background: var(--color-bg);
+  border: var(--rule-width) solid var(--color-rule);
+  padding: var(--space-3);
+  resize: vertical;
+}
+
+.foundry-intake__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.foundry-intake__status {
+  margin-top: var(--space-5);
+}
+
+.foundry-intake__progress {
+  list-style: none;
+  padding: 0;
+}
+
+.foundry-result__notice {
+  margin-bottom: var(--space-4);
+}
+
+.foundry-result__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+  padding-top: var(--space-3);
+  border-top: var(--rule-width) solid var(--color-rule);
+}
+
+.dossier {
+  display: grid;
+  gap: var(--space-5);
+  max-width: var(--measure-wide);
+}
+
+.dossier__section {
+  display: grid;
+  gap: var(--space-3);
+  border-top: var(--rule-width) solid var(--color-rule);
+  padding-top: var(--space-3);
+}
+
+.dossier__manual {
+  max-width: var(--measure);
+}
+
+.dossier__panel {
+  white-space: pre-line;
+}

@@ -57,4 +57,5 @@
   --page-gutter: var(--space-4);
   --grid-min-column: 16rem;
   --measure: 38rem;
+  --measure-wide: 56rem;
 }
