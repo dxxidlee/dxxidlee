@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Dieline } from "@/components/Dieline";
 import { formatCount, formatPrice } from "@/lib/format";
+import { Logo } from "@/components/Logo";
 import { pad } from "@/lib/pad";
 import { SHELF_INTERVAL_MS } from "@/lib/realtime";
 import type { Subsidiary } from "@/lib/types";
@@ -34,7 +35,9 @@ export function KioskShelf({ initial }: { initial: Subsidiary[] }) {
   return (
     <>
       <header className="kiosk-top">
-        <span>Fidelis OS</span>
+        <span>
+          <Logo />
+        </span>
         <span>Store</span>
         <span>{items.length ? `${pad(index + 1)} / ${pad(items.length)}` : ""}</span>
       </header>

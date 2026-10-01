@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { formatCount, formatLabel } from "@/lib/format";
+import { Logo } from "@/components/Logo";
 import { pad } from "@/lib/pad";
 import {
   HOLDINGS_PAGE_INTERVAL_MS,
@@ -47,7 +48,9 @@ export function KioskHoldings({ initial }: { initial: HoldingsReport }) {
   return (
     <>
       <header className="kiosk-top">
-        <span>Fidelis OS</span>
+        <span>
+          <Logo />
+        </span>
         <span>Holdings</span>
         <span>{pages > 1 ? `Page ${current + 1} / ${pages}` : "Live"}</span>
       </header>
