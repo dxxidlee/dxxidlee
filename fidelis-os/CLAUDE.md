@@ -1,0 +1,93 @@
+# Fidelis OS
+
+Thesis project by David Lee (Parsons Communication Design).
+Fidelis is a fictional holding company whose actual product is belief.
+Fidelis OS is the company running as live software: anyone states a desire, Fidelis manufactures a belief to meet it, sells it back to them, and adds it to the portfolio.
+
+Tone: deadpan corporate. Never winks. The satire lives in how sincere it is.
+
+## Three layers, one database
+
+1. **Foundry (make)**: user states what they want to feel or believe. Claude generates a complete subsidiary: name, product, category, claim, packaging dieline, storefront copy, ad line, Trust Manual entry.
+2. **Storefront (sell)**: every subsidiary is listed in a shared store. "Believe" is the buy button. Buying = believing.
+3. **Holdings (hold)**: live portfolio of every subsidiary, ranked by believers, with deltas and status.
+
+Go deep on Foundry. Storefront and Holdings are thinner views over the same data.
+
+## Stack
+
+- Next.js (App Router) + TypeScript
+- Supabase (Postgres + Realtime) for shared data and live Holdings
+- Anthropic API, model `claude-sonnet-5-5`, called only from server routes. Ask Claude for JSON only, validate with zod, retry once on parse failure
+- Packaging dielines as parametric SVG (tuck-end box), export to PDF with svg2pdf.js + jsPDF
+- Deploy target: Vercel
+- Env: `ANTHROPIC_API_KEY`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+- **v1 decision (David):** local SQLite (`better-sqlite3`, `data/fidelis.db`) instead of Supabase, so the only env var needed is `ANTHROPIC_API_KEY`. All data access goes through `lib/subsidiaries.ts` so Supabase can replace it later. Realtime in v1 means polling.
+
+## Design rules (important)
+
+David will redesign everything afterward. Build structure, not style.
+- All colors, type, spacing in one tokens file (`/styles/tokens.css`). Black, white, one gray. No accent color.
+- Typeface: `Fidelis Display` for display text, loaded from `/public/fonts/` (David will supply the file; use a neutral grotesk fallback until then). Body: system sans.
+- No gradients, shadows, rounded corners, icons libraries, or decorative motion.
+- Components small and unstyled-but-semantic so they are easy to restyle.
+
+## Data model
+
+`subsidiaries`
+- id, slug, created_at
+- desire (raw user input), category (object | ritual | subscription | service | institution)
+- company_name, product_name, tagline, claim
+- format (e.g. "30 count", "8 fl oz", "monthly")
+- active_ingredients (text[]), side_effects (text[])
+- price_cents
+- trust_devices (text[]: authority, proof, scarcity, belonging, purity, testimony, origin_myth, ritual)
+- manual_entry (text: how this belief is manufactured, written as internal brand guidelines)
+- packaging (jsonb: width, height, depth in mm, panel copy)
+- believers (int, default 0)
+- status (active | merged | acquired | discontinued)
+- is_flagship (bool)
+
+`beliefs` (purchases): id, subsidiary_id, created_at
+
+## Seed: flagship subsidiaries
+
+- **Hearth**: a personalized candle that smells like your childhood home.
+- **Neutral**: Wear no face, fear nothing.
+- **Quiet**: earbuds that cancel other people's opinions.
+- **Reservoir**: Bottled sleep. Take tonight's 8 hours now, store the rest for later.
+
+Fill remaining fields in the same voice.
+
+## Routes
+
+- `/` landing: "Trust, manufactured." Entry points to the three layers.
+- `/foundry` intake ("What do you need to believe?") → generating state → result: full subsidiary card, dieline preview, "Download dieline (PDF)", "List in store".
+- `/store` grid of all active subsidiaries. `/store/[slug]` product page with Believe button.
+- `/holdings` ranked table: name, category, believers, 24h delta, status, founded date. Realtime updates. Totals row: subsidiaries held, total believers.
+- `/manual` the Trust Manual, compiled from every subsidiary's manual_entry, grouped by trust device.
+- `/install/shelf` and `/install/holdings` fullscreen kiosk modes for the exhibition (no nav, auto-cycling, large type).
+
+## Generation guardrails
+
+- Never use real brand names, real companies, or real people.
+- No real dosing or real medical instructions. Products are fictional.
+- Reject hateful or harassing input with a deadpan corporate decline ("Fidelis does not manufacture this belief.").
+- Rate limit Foundry per IP.
+
+## Holdings logic (v1)
+
+- Rank by believers.
+- 24h delta from `beliefs` timestamps.
+- Mark `discontinued` if zero new believers in 14 days (computed on read).
+- Mergers and acquisitions: v2, not now.
+
+## Milestones
+
+1. Scaffold Next.js + Supabase, tokens file, schema, seed flagships, `/store` and `/store/[slug]` with working Believe button.
+2. Foundry: intake, Claude generation route, zod validation, save to DB, result view.
+3. Dieline: parametric SVG tuck-end box from packaging json, PDF export.
+4. Holdings with Realtime, Trust Manual page.
+5. Kiosk modes, rate limiting, input moderation, deploy to Vercel.
+
+Stop after each milestone, summarize what changed, and wait for David before continuing.
