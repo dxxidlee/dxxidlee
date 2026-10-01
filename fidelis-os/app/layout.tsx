@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import "@fontsource/inter-tight/latin-300.css";
+import "@fontsource/inter-tight/latin-400.css";
+import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import "@/styles/globals.css";
 
@@ -11,8 +14,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <SiteHeader />
-        <main>{children}</main>
+        <div className="vw">
+          <SiteHeader />
+          <main className="vw-in">{children}</main>
+          <SiteFooter />
+        </div>
       </body>
     </html>
   );

@@ -19,18 +19,20 @@ Go deep on Foundry. Storefront and Holdings are thinner views over the same data
 - Next.js (App Router) + TypeScript
 - Supabase (Postgres + Realtime) for shared data and live Holdings
 - Anthropic API, model `claude-sonnet-5-5`, called only from server routes. Ask Claude for JSON only, validate with zod, retry once on parse failure
-- Packaging dielines as parametric SVG (tuck-end box), export to PDF with svg2pdf.js + jsPDF
+- Packaging dielines as parametric SVG (tuck-end box), export to PDF with svg2pdf.js + jsPDF. Geometry in `lib/dieline.ts` (reverse tuck end, true millimetres), drawing in `components/Dieline.tsx`. The PDF uses Helvetica because PDF viewers lack the web font
 - Deploy target: Vercel
 - Env: `ANTHROPIC_API_KEY`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
 - **v1 decision (David):** local SQLite (`better-sqlite3`, `data/fidelis.db`) instead of Supabase, so the only env var needed is `ANTHROPIC_API_KEY`. All data access goes through `lib/subsidiaries.ts` so Supabase can replace it later. Realtime in v1 means polling.
 
 ## Design rules (important)
 
-David will redesign everything afterward. Build structure, not style.
-- All colors, type, spacing in one tokens file (`/styles/tokens.css`). Black, white, one gray. No accent color.
-- Typeface: `Fidelis Display` for display text, loaded from `/public/fonts/` (David will supply the file; use a neutral grotesk fallback until then). Body: system sans.
-- No gradients, shadows, rounded corners, icons libraries, or decorative motion.
-- Components small and unstyled-but-semantic so they are easy to restyle.
+Prototype styling uses the design system from David's portfolio (the `dxxidlee` repo, `src/styles/global.css` and `system.css`). David will redesign everything afterward. Build structure, not style.
+- All colors, type, spacing in one tokens file (`/styles/tokens.css`). Five-value palette only: black, gray `#767676`, silver `#D9D9D9`, smoke `#F0F0F0`, white. No accent color.
+- Typeface: Inter Tight 300 and 400 (`@fontsource/inter-tight`). 12px UI, 14px body, 18px light lines, light display headlines with the lead phrase in ink and the rest in gray.
+- Components from the portfolio system: `.bar` (smoke strip), `.chip` (black action), `.seg` nav, `.kv` and `.rows` lists with silver rules, the 24-column `.g24` grid with 5px gap, intro (16 units text, 6 units side) and module (16 units media, 6 units info) layouts, fixed top header and bottom bar.
+- Copy: sentence case, no em dashes.
+- No gradients, shadows, rounded corners, icon libraries, or decorative motion.
+- Components small and semantic so they are easy to restyle.
 
 ## Data model
 

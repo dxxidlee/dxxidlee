@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Dieline } from "@/components/Dieline";
+import { DownloadDielineButton } from "@/components/DownloadDielineButton";
+import { Intro } from "@/components/Intro";
 import { ListInStoreButton } from "@/components/ListInStoreButton";
 import { SubsidiaryDossier } from "@/components/SubsidiaryDossier";
 import { getSubsidiaryBySlug } from "@/lib/subsidiaries";
@@ -19,13 +22,36 @@ export default async function FoundryResultPage({ params }: Props) {
   if (!subsidiary) notFound();
 
   return (
-    <section className="foundry-result">
-      <p className="foundry-result__notice">Subsidiary founded.</p>
-      <SubsidiaryDossier subsidiary={subsidiary} />
-      <nav className="foundry-result__actions" aria-label="Next steps">
-        <ListInStoreButton slug={subsidiary.slug} listed={subsidiary.listed_at !== null} />
-        <Link href="/foundry">Manufacture another belief</Link>
-      </nav>
-    </section>
+    <>
+      <Intro
+        title={`${subsidiary.company_name}.`}
+        lead={subsidiary.tagline}
+        side={
+          <>
+            <p className="bar">
+              <span>Subsidiary founded</span>
+              <span className="dim">Foundry</span>
+            </p>
+            <ListInStoreButton slug={subsidiary.slug} listed={subsidiary.listed_at !== null} />
+            <DownloadDielineButton svgId="dieline" filename={`${subsidiary.slug}-dieline.pdf`} />
+            <Link className="bar go" href="/foundry">
+              <span>Manufacture another belief</span>
+              <span>+</span>
+            </Link>
+          </>
+        }
+      >
+        <p className="line">{subsidiary.claim}</p>
+      </Intro>
+
+      <section className="g24 mod">
+        <figure className="m-media sheet">
+          <Dieline subsidiary={subsidiary} id="dieline" />
+        </figure>
+        <div className="m-info">
+          <SubsidiaryDossier subsidiary={subsidiary} internal />
+        </div>
+      </section>
+    </>
   );
 }

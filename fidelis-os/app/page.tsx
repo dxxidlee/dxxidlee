@@ -1,41 +1,39 @@
 import Link from "next/link";
+import { Intro } from "@/components/Intro";
+import { pad } from "@/lib/pad";
 
 const LAYERS = [
-  {
-    href: "/foundry",
-    label: "Make",
-    name: "Foundry",
-    description: "State what you need to believe. Fidelis will manufacture it.",
-  },
-  {
-    href: "/store",
-    label: "Sell",
-    name: "Storefront",
-    description: "Every belief Fidelis has made, available to the public.",
-  },
-  {
-    href: "/holdings",
-    label: "Hold",
-    name: "Holdings",
-    description: "The portfolio. Every subsidiary, ranked by believers.",
-  },
+  { href: "/foundry", name: "Foundry", verb: "Make" },
+  { href: "/store", name: "Store", verb: "Sell" },
+  { href: "/holdings", name: "Holdings", verb: "Hold" },
 ];
 
 export default function Home() {
   return (
-    <section className="landing">
-      <h1 className="landing__title">Trust, manufactured.</h1>
-      <ul className="landing__layers">
-        {LAYERS.map((layer) => (
-          <li key={layer.href}>
-            <p className="label">{layer.label}</p>
-            <h2>
-              <Link href={layer.href}>{layer.name}</Link>
-            </h2>
-            <p>{layer.description}</p>
-          </li>
-        ))}
-      </ul>
-    </section>
+    <Intro
+      title="Trust, manufactured."
+      lead="Fidelis is a holding company whose product is belief. State a desire. Fidelis manufactures a belief to meet it, sells it back to you, and adds it to the portfolio."
+      side={
+        <>
+          <ul className="bars">
+            {LAYERS.map((layer, i) => (
+              <li key={layer.href}>
+                <Link className="bar" href={layer.href}>
+                  <span>
+                    <span className="no">{pad(i + 1)}</span>
+                    {layer.name}
+                  </span>
+                  <span>{layer.verb}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <Link className="chip go" href="/foundry">
+            <span>Manufacture a belief</span>
+            <span>+</span>
+          </Link>
+        </>
+      }
+    />
   );
 }

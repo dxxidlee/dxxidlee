@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { FoundryResponse } from "@/lib/foundry/schema";
+import { pad } from "@/lib/pad";
 
 // Shown one after another while the Foundry works. The last one holds.
 const PROGRESS = [
@@ -65,42 +66,62 @@ export function FoundryIntake() {
   }
 
   return (
-    <div className="foundry-intake">
-      <form onSubmit={submit} className="foundry-intake__form">
+    <section className="g24 intro">
+      <form id="foundry-form" className="i-text" onSubmit={submit}>
         <h1>
-          <label htmlFor="desire">What do you need to believe?</label>
+          <label className="nm" htmlFor="desire">
+            What do you need to believe?
+          </label>{" "}
+          State a desire. Fidelis will manufacture the belief and found a company to sell it.
         </h1>
-        <textarea
-          id="desire"
-          name="desire"
-          value={desire}
-          onChange={(e) => setDesire(e.target.value)}
-          minLength={3}
-          maxLength={280}
-          rows={3}
-          required
-          disabled={generating}
-          placeholder="I want to feel..."
-        />
-        <div className="foundry-intake__actions">
-          <button type="submit" disabled={generating || desire.trim().length < 3}>
-            {generating ? "Manufacturing" : "Manufacture"}
-          </button>
-          <span className="muted">{desire.length} / 280</span>
+        <div className="intake">
+          <textarea
+            id="desire"
+            name="desire"
+            value={desire}
+            onChange={(e) => setDesire(e.target.value)}
+            minLength={3}
+            maxLength={280}
+            rows={3}
+            required
+            disabled={generating}
+            placeholder="I want to feel..."
+          />
+          <p className="bar">
+            <span className="dim">Stated in your own words</span>
+            <span className="dim">{desire.length} / 280</span>
+          </p>
         </div>
       </form>
 
-      <div aria-live="polite" className="foundry-intake__status">
-        {generating ? (
-          <ol className="foundry-intake__progress">
-            {PROGRESS.slice(0, step + 1).map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ol>
-        ) : null}
-        {state.kind === "declined" ? <p>{state.message}</p> : null}
-        {state.kind === "error" ? <p>{state.message}</p> : null}
-      </div>
-    </div>
+      <aside className="i-side">
+        <ol className="rows" aria-live="polite">
+          {generating
+            ? PROGRESS.slice(0, step + 1).map((line, i) => (
+                <li key={line}>
+                  <span>
+                    <span className="no">{pad(i + 1)}</span>
+                    {line}
+                  </span>
+                </li>
+              ))
+            : null}
+          {state.kind === "declined" || state.kind === "error" ? (
+            <li>
+              <span>{state.message}</span>
+            </li>
+          ) : null}
+        </ol>
+        <button
+          type="submit"
+          form="foundry-form"
+          className="chip go"
+          disabled={generating || desire.trim().length < 3}
+        >
+          <span>{generating ? "Manufacturing" : "Manufacture"}</span>
+          <span>+</span>
+        </button>
+      </aside>
+    </section>
   );
 }

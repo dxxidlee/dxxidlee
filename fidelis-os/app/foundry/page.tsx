@@ -4,9 +4,5 @@ import { FoundryIntake } from "@/components/FoundryIntake";
 export const metadata: Metadata = { title: "Foundry" };
 
 export default function FoundryPage() {
-  return (
-    <section className="foundry">
-      <FoundryIntake />
-    </section>
-  );
+  return <FoundryIntake />;
 }

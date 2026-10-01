@@ -45,6 +45,14 @@ Supabase replaces SQLite later by reimplementing `lib/subsidiaries.ts`.
 
 ## Where to restyle
 
+The prototype borrows the dxxidlee.com portfolio system: five-value palette,
+Inter Tight, bars, chips and the 24-column unit grid.
+
 - `styles/tokens.css`: every color, typeface, size and space
-- `styles/globals.css`: structural layout, using tokens only
-- `public/fonts/`: drop `FidelisDisplay.woff2` here
+- `styles/globals.css`: the portfolio's classes (`.bar`, `.chip`, `.seg`, `.kv`, `.g24`, intro and module layouts), using tokens only
+
+## Dieline
+
+- Geometry: `lib/dieline.ts`, a reverse tuck end box at true size in millimetres
+- Drawing: `components/Dieline.tsx` (cut lines solid, folds dashed)
+- PDF: `components/DownloadDielineButton.tsx` (jsPDF and svg2pdf.js, in the browser)

@@ -15,9 +15,10 @@ export function ListInStoreButton({ slug, listed: initiallyListed }: Props) {
 
   if (listed) {
     return (
-      <p>
-        Listed. <Link href={`/store/${slug}`}>View in store</Link>
-      </p>
+      <Link className="bar" href={`/store/${slug}`}>
+        <span>Listed in store</span>
+        <span>View +</span>
+      </Link>
     );
   }
 
@@ -36,11 +37,16 @@ export function ListInStoreButton({ slug, listed: initiallyListed }: Props) {
   }
 
   return (
-    <div className="list-in-store">
-      <button type="button" onClick={list} disabled={pending}>
-        {pending ? "Listing" : "List in store"}
+    <>
+      <button type="button" className="chip" onClick={list} disabled={pending}>
+        <span>{pending ? "Listing" : "List in store"}</span>
+        <span>+</span>
       </button>
-      {error ? <p aria-live="polite">{error}</p> : null}
-    </div>
+      {error ? (
+        <p className="status" aria-live="polite">
+          {error}
+        </p>
+      ) : null}
+    </>
   );
 }

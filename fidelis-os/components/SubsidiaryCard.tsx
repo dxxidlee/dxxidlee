@@ -1,22 +1,42 @@
 import Link from "next/link";
-import { formatBelievers, formatPrice } from "@/lib/format";
+import { formatCount, formatLabel, formatPrice } from "@/lib/format";
+import { pad } from "@/lib/pad";
 import type { Subsidiary } from "@/lib/types";
 
-export function SubsidiaryCard({ subsidiary }: { subsidiary: Subsidiary }) {
+/** One subsidiary in the Store grid, laid out like a portfolio module's info column. */
+export function SubsidiaryCard({ subsidiary, n }: { subsidiary: Subsidiary; n: number }) {
+  const href = `/store/${subsidiary.slug}`;
   return (
-    <article className="subsidiary-card">
-      <Link href={`/store/${subsidiary.slug}`}>
-        <p className="label">
-          {subsidiary.category}
-          {subsidiary.is_flagship ? " / Flagship" : null}
-        </p>
-        <h2>{subsidiary.company_name}</h2>
-        <p>{subsidiary.product_name}</p>
-        <p className="muted">{subsidiary.tagline}</p>
-        <p className="subsidiary-card__meta">
-          <span>{formatPrice(subsidiary.price_cents)}</span>
-          <span>{formatBelievers(subsidiary.believers)}</span>
-        </p>
+    <article className="card">
+      <Link className="bar" href={href}>
+        <span>
+          <span className="no">{pad(n)}</span>
+          {subsidiary.company_name}
+        </span>
+        <span>{formatPrice(subsidiary.price_cents)}</span>
+      </Link>
+      <p className="line">{subsidiary.tagline}</p>
+      <dl className="kv">
+        <div>
+          <dt>Product</dt>
+          <dd>{subsidiary.product_name}</dd>
+        </div>
+        <div>
+          <dt>Category</dt>
+          <dd>{formatLabel(subsidiary.category)}</dd>
+        </div>
+        <div>
+          <dt>Format</dt>
+          <dd>{subsidiary.format}</dd>
+        </div>
+        <div>
+          <dt>Believers</dt>
+          <dd>{formatCount(subsidiary.believers)}</dd>
+        </div>
+      </dl>
+      <Link className="bar go" href={href}>
+        <span>View product</span>
+        <span>+</span>
       </Link>
     </article>
   );

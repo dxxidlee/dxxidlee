@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { formatBelievers } from "@/lib/format";
+import { formatBelievers, formatCount } from "@/lib/format";
 
 type Props = {
   slug: string;
@@ -31,14 +31,14 @@ export function BelieveButton({ slug, initialBelievers }: Props) {
   }
 
   return (
-    <div className="believe">
-      <button type="button" onClick={believe} disabled={pending}>
-        {pending ? "Processing" : "Believe"}
+    <div className="bars">
+      <button type="button" className="chip" onClick={believe} disabled={pending}>
+        <span>{pending ? "Processing" : "Believe"}</span>
+        <span className="believe-count">{formatCount(believers)}</span>
       </button>
-      <div aria-live="polite">
-        <p className="believe__count">{formatBelievers(believers)}</p>
-        {message ? <p className="believe__message">{message}</p> : null}
-      </div>
+      <p className="status dim" aria-live="polite">
+        {message ?? formatBelievers(believers)}
+      </p>
     </div>
   );
 }

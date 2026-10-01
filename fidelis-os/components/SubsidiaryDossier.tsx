@@ -1,108 +1,104 @@
-import { formatBelievers, formatDate, formatPrice } from "@/lib/format";
+import { formatCount, formatDate, formatLabel as label, formatPrice } from "@/lib/format";
 import type { Subsidiary } from "@/lib/types";
 
 const PANELS = ["front", "back", "left", "right", "top", "bottom"] as const;
 
-const deviceLabel = (device: string) => device.replace("_", " ");
+type Row = [string, React.ReactNode, string?];
 
-/** The complete record of a subsidiary, as the Foundry produced it. */
-export function SubsidiaryDossier({ subsidiary }: { subsidiary: Subsidiary }) {
-  const { packaging } = subsidiary;
+function Section({ title, rows }: { title: string; rows: Row[] }) {
+  return (
+    <section className="bars">
+      <h2 className="bar">
+        <span>{title}</span>
+      </h2>
+      <dl className="kv">
+        {rows.map(([k, v, cls]) => (
+          <div key={k}>
+            <dt>{k}</dt>
+            <dd className={cls}>{v}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+const list = (items: string[]) => (
+  <ul>
+    {items.map((item) => (
+      <li key={item}>{item}</li>
+    ))}
+  </ul>
+);
+
+/**
+ * A subsidiary's record as key and value rows.
+ * `internal` adds what only Fidelis sees: the Trust Manual, packaging copy, and origin.
+ */
+export function SubsidiaryDossier({
+  subsidiary: s,
+  internal = false,
+}: {
+  subsidiary: Subsidiary;
+  internal?: boolean;
+}) {
+  const { packaging: p } = s;
 
   return (
-    <article className="dossier">
-      <header className="dossier__header stack">
-        <p className="label">
-          {subsidiary.category}
-          {subsidiary.is_flagship ? " / Flagship" : null}
-        </p>
-        <h1>{subsidiary.company_name}</h1>
-        <p>{subsidiary.product_name}</p>
-        <p>{subsidiary.tagline}</p>
-        <p className="muted">{subsidiary.claim}</p>
-      </header>
-
-      <section className="dossier__section">
-        <h2 className="label">Commercial</h2>
-        <dl className="facts">
-          <dt>Price</dt>
-          <dd>{formatPrice(subsidiary.price_cents)}</dd>
-          <dt>Format</dt>
-          <dd>{subsidiary.format}</dd>
-          <dt>Believers</dt>
-          <dd>{formatBelievers(subsidiary.believers)}</dd>
-          <dt>Status</dt>
-          <dd>{subsidiary.status}</dd>
-        </dl>
-      </section>
-
-      <section className="dossier__section">
-        <h2 className="label">Composition</h2>
-        <dl className="facts">
-          <dt>Active ingredients</dt>
-          <dd>
-            <ul>
-              {subsidiary.active_ingredients.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </dd>
-          <dt>Side effects</dt>
-          <dd>
-            <ul>
-              {subsidiary.side_effects.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </dd>
-        </dl>
-      </section>
-
-      <section className="dossier__section">
-        <h2 className="label">Trust Manual entry</h2>
-        <dl className="facts">
-          <dt>Trust devices</dt>
-          <dd>
-            <ul>
-              {subsidiary.trust_devices.map((device) => (
-                <li key={device}>{deviceLabel(device)}</li>
-              ))}
-            </ul>
-          </dd>
-          <dt>Method</dt>
-          <dd className="dossier__manual">{subsidiary.manual_entry}</dd>
-        </dl>
-      </section>
-
-      <section className="dossier__section">
-        <h2 className="label">Packaging</h2>
-        <dl className="facts">
-          <dt>Box</dt>
-          <dd>
-            Tuck-end, {packaging.width} × {packaging.height} × {packaging.depth} mm (W × H × D)
-          </dd>
-          {PANELS.map((panel) => (
-            <div key={panel} className="facts__row">
-              <dt>{panel}</dt>
-              <dd className="dossier__panel">{packaging.panels[panel]}</dd>
-            </div>
-          ))}
-        </dl>
-      </section>
-
-      <section className="dossier__section">
-        <h2 className="label">Origin</h2>
-        <dl className="facts">
-          <dt>Desire</dt>
-          <dd>{subsidiary.desire}</dd>
-          <dt>Founded</dt>
-          <dd>
-            <time dateTime={subsidiary.created_at}>{formatDate(subsidiary.created_at)}</time>
-          </dd>
-          <dt>Parent</dt>
-          <dd>A Fidelis company.</dd>
-        </dl>
-      </section>
-    </article>
+    <div className="bars">
+      <Section
+        title="Product"
+        rows={[
+          ["Product", s.product_name],
+          ["Category", label(s.category)],
+          ["Format", s.format],
+          ["Price", formatPrice(s.price_cents)],
+          ["Believers", formatCount(s.believers)],
+          ...(internal ? ([["Status", label(s.status)]] as Row[]) : []),
+        ]}
+      />
+      <Section
+        title="Composition"
+        rows={[
+          ["Active ingredients", list(s.active_ingredients)],
+          ["Side effects", list(s.side_effects)],
+        ]}
+      />
+      {internal ? (
+        <>
+          <Section
+            title="Trust Manual entry"
+            rows={[
+              ["Devices", list(s.trust_devices.map(label))],
+              ["Method", s.manual_entry],
+            ]}
+          />
+          <Section
+            title="Packaging"
+            rows={[
+              ["Box", `Tuck end, ${p.width} × ${p.height} × ${p.depth} mm`],
+              ...PANELS.map((panel): Row => [label(panel), p.panels[panel], "pre"]),
+            ]}
+          />
+          <Section
+            title="Origin"
+            rows={[
+              ["Desire", s.desire],
+              ["Founded", formatDate(s.created_at)],
+              ["Listed", s.listed_at ? formatDate(s.listed_at) : "Not listed"],
+              ["Parent", "A Fidelis company"],
+            ]}
+          />
+        </>
+      ) : (
+        <Section
+          title="Company"
+          rows={[
+            ["Founded", formatDate(s.created_at)],
+            ["Parent", "A Fidelis company"],
+          ]}
+        />
+      )}
+    </div>
   );
 }
