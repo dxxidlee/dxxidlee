@@ -50,11 +50,11 @@ const tileStyle = (t) => (MOSAIC && mosaic[tileKey(t)] ? `--a:${mosaic[tileKey(t
 
       <section class="g24 intro">
         <div class="cell i-text" style={`--a:${A(1, 16, 1, 4)}`}>
+          <p class="bar"><span>{site.fullName}</span><span>{site.location}</span></p>
           <h1><span class="nm">{site.name}</span> {site.positioning}</h1>
         </div>
         <div class="cell i-side" style={`--a:${A(19, 6, 1, 4)}`}>
           <div class="bars">
-            <p class="bar"><span>{site.fullName}</span><span>{site.location}</span></p>
             {site.status.map((s) => <p class="bar">{pair(s).map((t) => <span>{t}</span>)}</p>)}
           </div>
           <nav class="i-toc" aria-label="Contents">

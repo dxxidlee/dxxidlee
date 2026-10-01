@@ -7,11 +7,11 @@ import { pad, pair, A } from '../lib/work.js';
 <Base nav="info">
   <section class="g24 intro">
     <div class="cell i-text" style={`--a:${A(1, 16, 1, 4)}`}>
+      <p class="bar"><span>Info</span><span>{site.location}</span></p>
       <h1><span class="nm">{site.fullName}</span> is a designer in New York working across identity systems, interfaces, and motion. He designs and codes his own websites and tools.{showDrafts && ' [One sentence on what draws you to the work.]'}</h1>
     </div>
     <div class="cell i-side" style={`--a:${A(19, 6, 1, 4)}`}>
       <div class="bars">
-        <p class="bar"><span>{site.fullName}</span><span>{site.location}</span></p>
         {site.status.map((s) => <p class="bar">{pair(s).map((t) => <span>{t}</span>)}</p>)}
       </div>
       <p class="bar"><span>Contact</span><span>{pad(site.links.length + 2)}</span></p>
