@@ -19,6 +19,8 @@ let fig = 0;
 const blocks = p.blocks.map((b) => {
   if (b.type === 'text') return { text: b.body };
   fig += 1;
+  if (b.type === 'pair' && b.flip) return { fig, caption: b.caption, cap: A(9, 16, 11, 1),
+    cells: [{ media: b.b, ratio: 'p', a: A(1, 8, 1, 10) }, { media: b.a, ratio: 'l', a: A(9, 16, 1, 10) }] };
   if (b.type === 'pair') return { fig, caption: b.caption, cap: A(1, 16, 11, 1),
     cells: [{ media: b.a, ratio: 'l', a: A(1, 16, 1, 10) }, { media: b.b, ratio: 'p', a: A(17, 8, 1, 10) }] };
   if (b.type === 'tester') return { fig, caption: b.caption, cap: A(1, 16, 9, 1), cells: [{ tester: b.text, a: A(1, 24, 1, 8) }] };
