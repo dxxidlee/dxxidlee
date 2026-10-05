@@ -12,6 +12,7 @@
 // Block types for project pages:
 //   { type: 'full',  ratio: 'l' (16:10) | 'w' (16:9) | 'p' (4:5), media, caption }
 //   { type: 'pair',  a: media (16:10), b: media (4:5), caption }
+//   { type: 'tester', text: 'protocol', caption }   (live PROTOCOL type, one line)
 //   { type: 'embed', url: 'https://www.youtube.com/embed/ID', caption }   (full-length videos)
 //   { type: 'text',  body: '...' }
 
@@ -131,7 +132,7 @@ export const projects = [
     blocks: [
       { type: 'full', ratio: 'l', media: m('PROTOCOL / XR full character set', '/media/protocol/glyphs.mp4'), caption: 'Full character set.' },
       { type: 'pair', a: m('A to Z rules spread 16:10'), b: m('Specimen booklet 4:5'), caption: '[Caption.]' },
-      { type: 'full', ratio: 'l', media: m('Type in use 16:10'), caption: '[Caption.]' },
+      { type: 'tester', text: 'protocol', caption: 'Live type. Click the line and type.' },
     ],
   },
   {
