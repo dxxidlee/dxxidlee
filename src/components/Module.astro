@@ -1,9 +1,11 @@
 ---
 // One project on the unit grid: cover, portrait, thumbnails, and an info column.
 import Media from './Media.astro';
-import { pad, thumbs, spec } from '../lib/work.js';
+import TypeTester from './TypeTester.astro';
+import { pad, thumbs, spec, tester } from '../lib/work.js';
 const { p, n, L, id } = Astro.props;
 const href = `/work/${p.slug}`;
+const tt = tester(p);
 ---
 <section class="g24 mod" id={id}>
   <a class="cell m-cover" href={href} style={`--a:${L.cover}`}>
@@ -20,4 +22,5 @@ const href = `/work/${p.slug}`;
     <p class="m-intro">{p.intro}</p>
     <a class="bar go" href={href}><span>View project</span><span>+</span></a>
   </div>
+  {tt && <div class="cell m-tt" style={`--a:${L.tester}`}><TypeTester text={tt.text} /></div>}
 </section>
