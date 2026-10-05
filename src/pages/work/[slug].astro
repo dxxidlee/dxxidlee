@@ -1,8 +1,9 @@
 ---
 // One template for every project. Every media block lands on whole units of the square grid:
-// 16:10 is 24 x 15 or 16 x 10, 4:5 is 8 x 10, 16:9 is 16 x 9.
+// 16:10 is 24 x 15 or 16 x 10, 4:5 is 8 x 10, 16:9 is 16 x 9, the type tester is 24 x 8.
 import Base from '../../layouts/Base.astro';
 import Media from '../../components/Media.astro';
+import TypeTester from '../../components/TypeTester.astro';
 import { visible } from '../../data/projects.js';
 import { pad, A, spec } from '../../lib/work.js';
 
@@ -20,6 +21,7 @@ const blocks = p.blocks.map((b) => {
   fig += 1;
   if (b.type === 'pair') return { fig, caption: b.caption, cap: A(1, 16, 11, 1),
     cells: [{ media: b.a, ratio: 'l', a: A(1, 16, 1, 10) }, { media: b.b, ratio: 'p', a: A(17, 8, 1, 10) }] };
+  if (b.type === 'tester') return { fig, caption: b.caption, cap: A(1, 16, 9, 1), cells: [{ tester: b.text, a: A(1, 24, 1, 8) }] };
   if (b.type === 'embed') return { fig, caption: b.caption, cap: A(17, 8, 1, 1), cells: [{ embed: b.url, a: A(1, 16, 1, 9) }] };
   const ratio = b.ratio || 'l';
   if (ratio === 'w') return { fig, caption: b.caption, cap: A(17, 8, 1, 1), cells: [{ media: b.media, ratio, a: A(1, 16, 1, 9) }] };
@@ -52,7 +54,9 @@ const blocks = p.blocks.map((b) => {
     <figure class="g24 pj">
       {b.cells.map((c) => (
         <div class="cell" style={`--a:${c.a}`}>
-          {c.embed
+          {c.tester !== undefined
+            ? <TypeTester text={c.tester} />
+            : c.embed
             ? <div class="pj-embed"><iframe src={c.embed} title={p.title} loading="lazy" allowfullscreen></iframe></div>
             : <Media media={c.media} ratio={c.ratio} />}
         </div>
