@@ -22,7 +22,7 @@ const blocks = p.blocks.map((b) => {
   if (b.type === 'pair' && b.flip) return { fig, caption: b.caption, cap: A(9, 16, 11, 1),
     cells: [{ media: b.b, ratio: 'p', a: A(1, 8, 1, 10) }, { media: b.a, ratio: 'l', a: A(9, 16, 1, 10) }] };
   if (b.type === 'pair') return { fig, caption: b.caption, cap: A(1, 16, 11, 1),
-    cells: [{ media: b.a, ratio: 'l', a: A(1, 16, 1, 10) }, { media: b.b, ratio: 'p', a: A(17, 8, 1, 10) }] };
+    cells: [{ media: b.a, ratio: 'l', a: A(1, 16, 1, 10) }, { media: b.b, ratio: 'p', a: A(17, 8, 1, 10), first: b.mobileFirst === 'b' }] };
   if (b.type === 'tester') return { fig, caption: b.caption, cap: A(1, 16, 9, 1), cells: [{ tester: b.text, a: A(1, 24, 1, 8) }] };
   if (b.type === 'embed') return { fig, caption: b.caption, cap: A(17, 8, 1, 1), cells: [{ embed: b.url, a: A(1, 16, 1, 9) }] };
   const ratio = b.ratio || 'l';
@@ -55,7 +55,7 @@ const blocks = p.blocks.map((b) => {
   ) : (
     <figure class="g24 pj">
       {b.cells.map((c) => (
-        <div class="cell" style={`--a:${c.a}`}>
+        <div class:list={['cell', { 'pj-first': c.first }]} style={`--a:${c.a}`}>
           {c.tester !== undefined
             ? <TypeTester text={c.tester} />
             : c.embed
@@ -104,6 +104,7 @@ const blocks = p.blocks.map((b) => {
     .pj .slot.l{aspect-ratio:16/10;} .pj .slot.w{aspect-ratio:16/9;} .pj .slot.p{aspect-ratio:4/5;}
     .pj-embed{aspect-ratio:16/9;height:auto;}
     .pj-cap{align-self:stretch;}
+    .pj-first{order:-1;}
     .pj-next{padding-top:32px;}
   }
 </style>
