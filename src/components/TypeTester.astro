@@ -1,0 +1,76 @@
+---
+// One line of live PROTOCOL type, drawn with the construction sheet look.
+const { text = 'protocol' } = Astro.props;
+---
+<div class="tt" data-tt>
+  <canvas aria-hidden="true"></canvas>
+  <span class="tt-caret" aria-hidden="true"></span>
+  <input type="text" value={text} maxlength="32" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off" enterkeyhint="done" aria-label="Type with PROTOCOL" />
+</div>
+
+<script>
+  const els = document.querySelectorAll('[data-tt]');
+  if (els.length) {
+    import('../lib/protocol-type.js').then(({ draw, clean }) => {
+      els.forEach((el) => {
+        const cv = el.querySelector('canvas');
+        const input = el.querySelector('input');
+        const caret = el.querySelector('.tt-caret');
+        let first = true;
+
+        const render = () => {
+          const r = cv.getBoundingClientRect();
+          const d = Math.min(window.devicePixelRatio || 1, 2.5);
+          const w = Math.round(r.width * d), h = Math.round(r.height * d);
+          if (!w || !h) return;
+          if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+          const focused = document.activeElement === input;
+          const n = input.value.length;
+          const a = focused ? input.selectionStart ?? n : n;
+          const b = focused ? input.selectionEnd ?? n : n;
+          const c = draw(cv, input.value, a, b);
+          caret.style.left = `${c.x * 100}%`;
+          caret.style.top = `${c.top * 100}%`;
+          caret.style.height = `${(c.bottom - c.top) * 100}%`;
+          el.classList.toggle('sel', a !== b);
+        };
+
+        input.addEventListener('input', () => {
+          const v = input.value, p = input.selectionStart ?? v.length;
+          const nv = clean(v);
+          if (nv !== v) {
+            const np = clean(v.slice(0, p)).length;
+            input.value = nv;
+            input.setSelectionRange(np, np);
+          }
+          render();
+        });
+        input.addEventListener('keydown', (e) => { if (e.key === 'Enter') input.blur(); });
+        input.addEventListener('focus', () => el.classList.add('on'));
+        input.addEventListener('blur', () => { el.classList.remove('on'); render(); });
+        document.addEventListener('selectionchange', () => { if (document.activeElement === input) render(); });
+
+        // The field itself is invisible, so clicks go to the end of the line (or select it all the first time).
+        el.addEventListener('click', () => {
+          input.focus();
+          const n = input.value.length;
+          if (first) { input.setSelectionRange(0, n); first = false; } else input.setSelectionRange(n, n);
+          render();
+        });
+
+        new ResizeObserver(render).observe(cv);
+      });
+    });
+  }
+</script>
+
+<style>
+  .tt{position:relative;height:100%;background:#000;overflow:hidden;cursor:text;}
+  .tt canvas{position:absolute;inset:0;width:100%;height:100%;display:block;}
+  .tt input{position:absolute;inset:0;width:100%;height:100%;opacity:0;pointer-events:none;font-size:16px;border:0;padding:0;}
+  .tt-caret{position:absolute;width:2px;margin-left:-1px;background:#fff;opacity:0;pointer-events:none;}
+  .tt.on:not(.sel) .tt-caret{animation:tt-blink 1s steps(1) infinite;}
+  @keyframes tt-blink{0%,50%{opacity:1}50.01%,100%{opacity:0}}
+  @media (prefers-reduced-motion:reduce){ .tt.on:not(.sel) .tt-caret{animation:none;opacity:1;} }
+  @media (max-width:760px){ .tt{height:auto;aspect-ratio:2/1;} }
+</style>
