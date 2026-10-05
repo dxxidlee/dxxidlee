@@ -131,7 +131,7 @@ export const projects = [
     intro: 'PROTOCOL grew out of XR, a circular-unit Didone built in Glyphs at Parsons School of Design. Each letter carries one rule of a dystopian bureaucratic rulebook, published as a type specimen.',
     blocks: [
       { type: 'pair', flip: true, a: m('PROTOCOL / XR full character set', '/media/protocol/glyphs.mp4'), b: m('PROTOCOL / XR mockup', '/media/protocol/protocol_mockup.jpg'), caption: 'Full character set.' },
-      { type: 'pair', a: m('A to Z rules spread 16:10'), b: m('Specimen booklet 4:5'), caption: '[Caption.]' },
+      { type: 'pair', a: m('PROTOCOL / XR example', '/media/protocol/protocol_example.svg'), b: m('PROTOCOL / XR specimen booklet scan', '/media/protocol/protocol-scan-black.jpg'), caption: '[Caption.]' },
       { type: 'tester', text: 'protocol', caption: 'Live type. Click the line and type.' },
     ],
   },
