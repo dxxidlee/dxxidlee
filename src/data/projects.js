@@ -11,7 +11,7 @@
 //
 // Block types for project pages:
 //   { type: 'full',  ratio: 'l' (16:10) | 'w' (16:9) | 'p' (4:5), media, caption }
-//   { type: 'pair',  a: media (16:10), b: media (4:5), caption }
+//   { type: 'pair',  a: media (16:10), b: media (4:5), caption }   (flip: true puts the 4:5 on the left)
 //   { type: 'tester', text: 'protocol', caption }   (live PROTOCOL type, one line)
 //   { type: 'embed', url: 'https://www.youtube.com/embed/ID', caption }   (full-length videos)
 //   { type: 'text',  body: '...' }
@@ -126,11 +126,11 @@ export const projects = [
     role: 'Type design',
     tools: 'Glyphs',
     live: null,
-    cover: m('PROTOCOL / XR glyph grid', '/media/protocol/cover.jpg'),
-    portrait: m('4:5, specimen booklet photo'),
+    cover: m('PROTOCOL / XR reel', '/media/protocol/protocol-reel-16x9.mp4'),
+    portrait: m('PROTOCOL / XR mockup', '/media/protocol/protocol_mockup.jpg'),
     intro: 'PROTOCOL grew out of XR, a circular-unit Didone built in Glyphs at Parsons School of Design. Each letter carries one rule of a dystopian bureaucratic rulebook, published as a type specimen.',
     blocks: [
-      { type: 'full', ratio: 'l', media: m('PROTOCOL / XR full character set', '/media/protocol/glyphs.mp4'), caption: 'Full character set.' },
+      { type: 'pair', flip: true, a: m('PROTOCOL / XR full character set', '/media/protocol/glyphs.mp4'), b: m('PROTOCOL / XR mockup', '/media/protocol/protocol_mockup.jpg'), caption: 'Full character set.' },
       { type: 'pair', a: m('A to Z rules spread 16:10'), b: m('Specimen booklet 4:5'), caption: '[Caption.]' },
       { type: 'tester', text: 'protocol', caption: 'Live type. Click the line and type.' },
     ],

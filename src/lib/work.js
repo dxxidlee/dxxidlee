@@ -22,6 +22,7 @@ export const layouts = [
 export const thumbs = (p) => {
   const list = p.blocks
     .flatMap((b) => (b.type === 'pair' ? [b.a, b.b] : b.media ? [b.media] : []))
+    .filter((m) => !m.src || m.src !== p.portrait?.src)
     .map((media) => ({ media }));
   const tt = p.blocks.find((b) => b.type === 'tester');
   if (tt) list.splice(1, 1, { tester: tt.text });
