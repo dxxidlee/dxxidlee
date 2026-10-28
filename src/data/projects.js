@@ -8,16 +8,18 @@
 //   no src  -> renders a labeled placeholder of the right ratio
 //   .mp4    -> muted autoplay loop (plays only while on screen)
 //   other   -> image
+//   tile    -> 1:1 (or other) crop used only in the packed desktop Grid mosaic;
+//              cover stays 16:10 / 16:9 for Expanded, the case study, and Grid under 1260px
 //
 // Block types for project pages:
 //   { type: 'full',  ratio: 'l' (16:10) | 'w' (16:9) | 'p' (4:5), media, caption }
 //   { type: 'pair',  a: media (16:10), b: media (4:5), caption }   (flip: true puts the 4:5 on the left;
 //                                                                   mobileFirst: 'b' shows the 4:5 first on phones)
 //   { type: 'tester', text: 'protocol', caption }   (live PROTOCOL type, one line)
-//   { type: 'embed', url: 'https://www.youtube.com/embed/ID', caption }   (full-length videos)
+//   { type: 'clip',  title, body, media, stills? }  (16:9 video + stacked stills, sides alternate)
 //   { type: 'text',  body: '...' }
 
-const m = (label, src) => ({ label, src });
+const m = (label, src, extra = {}) => ({ label, src, ...extra });
 
 export const projects = [
   {
@@ -50,7 +52,8 @@ export const projects = [
     role: 'Design Intern, then Freelance Designer',
     tools: '[Tauri, JavaScript, ExtendScript]',
     live: null,
-    cover: m('16:10 loop, RefStrip with dummy references'),
+    cover: m('McCANN Truth Well Told', '/media/mccann/McCANN_TruthWellTold_16x10_1920x1200-hq.mp4'),
+    tile: m('McCANN Truth Well Told', '/media/mccann/McCANN_TruthWellTold_1x1_1080x1080.mp4'),
     portrait: m('4:5, tool UI detail'),
     intro: 'Design Intern from June to August 2026, Freelance Designer since. At McCANN I work on client design and motion, and build tools that speed up the team: a desktop reference board, a lockup generator, and After Effects scripts. Client work is under NDA and available on request.',
     blocks: [
@@ -105,16 +108,29 @@ export const projects = [
     role: 'GFX artist',
     tools: '[After Effects, etc.]',
     live: null,
-    cover: m('16:10 loop, best title moment'),
+    cover: m('Titles and GFX motion reel', '/media/title_gfx/motion-reel-hero-v3-hq.mp4'),
+    coverRatio: 'w',
     portrait: m('4:5, credit frame'),
     intro: 'Title and graphics work for music videos, from single title cards to full credit sequences.',
     blocks: [
-      { type: 'text', body: 'Something Special, Khalid and Ahn Hyo-seop. Official music video. Title card and credits. Director: [name].' },
-      { type: 'full', ratio: 'l', media: m('Something Special title moment 6s'), caption: '' },
-      { type: 'text', body: 'Fugue State, MegaETH. Music video by Oliver Shore and Kevin Puttkamer. GFX.' },
-      { type: 'full', ratio: 'l', media: m('Fugue State GFX moment 6s'), caption: '' },
-      { type: 'text', body: 'Can\u2019t FW Us, [artist]. Music video. Shooting, editing, title card, and GFX.' },
-      { type: 'full', ratio: 'l', media: m('Can\u2019t FW Us moment 6s'), caption: '' },
+      { type: 'clip', title: 'Yin and Yang', body: 'Lyric video.',
+        media: m('Yin and Yang lyric', '/media/title_gfx/01-yin-and-yang-lyric.mp4'),
+        stills: [m('Yin and Yang still 1', '/media/title_gfx/01-yin-and-yang-lyric_still-1.jpg'), m('Yin and Yang still 2', '/media/title_gfx/01-yin-and-yang-lyric_still-2.jpg')] },
+      { type: 'clip', title: 'Sadder Days', body: 'Billboard.',
+        media: m('Sadder Days billboard', '/media/title_gfx/02-sadder-days-billboard.mp4'),
+        stills: [m('Sadder Days still 1', '/media/title_gfx/02-sadder-days_still-1.jpg'), m('Sadder Days still 2', '/media/title_gfx/02-sadder-days_still-2.jpg')] },
+      { type: 'clip', title: 'Can\u2019t FW Us', body: '[Artist]. Music video. Shooting, editing, title card, and GFX.',
+        media: m('Can\u2019t FW Us', '/media/title_gfx/03-jireh-cant-fw-us.mp4'),
+        stills: [m('Can\u2019t FW Us still 1', '/media/title_gfx/03-jireh-cant-fw-us_still-1.jpg'), m('Can\u2019t FW Us still 2', '/media/title_gfx/03-jireh-cant-fw-us_still-2.jpg')] },
+      { type: 'clip', title: 'Real Estate', body: 'Visualizer for Thomas Maggart.',
+        media: m('Real Estate visualizer', '/media/title_gfx/04-real-estate.mp4'),
+        stills: [m('Real Estate still 1', '/media/title_gfx/04-real-estate_still-1.jpg'), m('Real Estate still 2', '/media/title_gfx/04-real-estate_still-2.jpg')] },
+      { type: 'clip', title: 'Fugue State', body: 'MegaETH. Music video by Oliver Shore and Kevin Puttkamer. GFX.',
+        media: m('Fugue State GFX', '/media/title_gfx/05-fugue-state-gfx.mp4'),
+        stills: [m('Fugue State still 1', '/media/title_gfx/05-fugue-state-gfx_still-1.jpg'), m('Fugue State still 2', '/media/title_gfx/05-fugue-state-gfx_still-2.jpg')] },
+      { type: 'clip', title: 'Something Special', body: 'Khalid and Ahn Hyo-seop. Official music video. Title card and credits. Director: [name].',
+        media: m('Something Special type', '/media/title_gfx/06-something-special-type.mp4'),
+        stills: [m('Something Special still 1', '/media/title_gfx/06-something-special-type_still-1.jpg'), m('Something Special still 2', '/media/title_gfx/06-something-special-type_still-2.jpg')] },
     ],
   },
   {

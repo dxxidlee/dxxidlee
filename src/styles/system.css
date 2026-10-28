@@ -27,6 +27,8 @@
 .g24{--u:calc((100cqw - 23 * var(--gap)) / 24);display:grid;grid-template-columns:repeat(24,var(--u));grid-auto-rows:var(--u);gap:var(--gap);}
 .g24 > .cell{grid-area:var(--a);min-width:0;min-height:0;}
 .cell .slot{aspect-ratio:auto;height:100%;}
+.cell .slot.w{aspect-ratio:16/9;height:auto;}
+.cell .slot.w video{position:static;width:100%;height:auto;inset:auto;object-fit:unset;}
 
 /* page intro: text on the left 16 units, a side column on the right 6 */
 .intro{grid-template-rows:repeat(4,minmax(var(--u),auto));padding-top:calc(var(--u) + var(--gap));margin-bottom:var(--u);}
@@ -78,6 +80,7 @@
   .mod{margin-bottom:32px;}
   .mod .cell{grid-area:auto;}
   .m-cover .slot{aspect-ratio:16/10;height:auto;}
+  .m-cover .slot.w{aspect-ratio:16/9;}
   .m-port,.m-thumb,.m-intro{display:none;}
   .vw-bottom{left:var(--gap);}
   .vw-bottom .chip > :first-child{display:none;}

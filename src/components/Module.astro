@@ -5,10 +5,11 @@ import TypeTester from './TypeTester.astro';
 import { pad, thumbs, spec } from '../lib/work.js';
 const { p, n, L, id } = Astro.props;
 const href = `/work/${p.slug}`;
+const coverRatio = p.coverRatio || 'l';
 ---
 <section class="g24 mod" id={id}>
   <a class="cell m-cover" href={href} style={`--a:${L.cover}`}>
-    <Media media={p.cover} ratio="l" />
+    <Media media={p.cover} ratio={coverRatio} />
   </a>
   <a class="cell m-port" href={href} style={`--a:${L.port}`} tabindex="-1" aria-hidden="true"><Media media={p.portrait} ratio="p" /></a>
   {thumbs(p).map((t, k) => t.tester !== undefined

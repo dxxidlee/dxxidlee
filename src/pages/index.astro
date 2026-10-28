@@ -95,7 +95,8 @@ const tileStyle = (t) => (MOSAIC && mosaic[tileKey(t)] ? `--a:${mosaic[tileKey(t
             if (t.kind === 'project') return (
               <a class="gt" href={`/work/${t.p.slug}`} style={tileStyle(t)}>
                 <span class="bar"><span><span class="no">{pad(t.n)}</span>{t.p.title}</span><span>{t.p.year}</span></span>
-                <Media media={t.p.cover} ratio="l" />
+                <Media media={t.p.cover} ratio={t.p.coverRatio || 'l'} />
+                {t.p.tile && <Media media={t.p.tile} ratio="s" />}
                 <span class="gt-line">{t.p.line}</span>
               </a>
             );
@@ -192,6 +193,7 @@ const tileStyle = (t) => (MOSAIC && mosaic[tileKey(t)] ? `--a:${mosaic[tileKey(t
   .gt-list li > :first-child{overflow:hidden;text-overflow:ellipsis;}
   .gt-list li > :last-child{flex-shrink:0;}
   .gt-line{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.6em;padding:0 7px;}
+  .gt > .slot.s{display:none;}
 
   .vw[data-view="grid"] .vx{display:none;}
   .vw[data-view="grid"] .vg{display:block;}
@@ -202,6 +204,10 @@ const tileStyle = (t) => (MOSAIC && mosaic[tileKey(t)] ? `--a:${mosaic[tileKey(t
     .gt-grid.mosaic{--u:calc((100cqw - 23 * var(--gap)) / 24);grid-template-columns:repeat(24,var(--u));grid-auto-rows:var(--u);gap:var(--gap);}
     .mosaic .gt{grid-area:var(--a);min-height:0;overflow:hidden;}
     .mosaic .gt > .slot,.mosaic .gt > .gt-body{flex:1 1 0;min-height:0;aspect-ratio:auto;}
+    .mosaic .gt > .slot.w{flex:0 0 auto;aspect-ratio:16/9;height:auto;}
+    .mosaic .gt:has(.slot.w) .gt-line{display:none;}
+    .mosaic .gt:has(.slot.s) > .slot:not(.s){display:none;}
+    .mosaic .gt > .slot.s{display:block;}
   }
 
   /* everything table */

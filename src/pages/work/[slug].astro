@@ -1,6 +1,6 @@
 ---
 // One template for every project. Every media block lands on whole units of the square grid:
-// 16:10 is 24 x 15 or 16 x 10, 4:5 is 8 x 10, 16:9 is 16 x 9, the type tester is 24 x 8.
+// 16:10 is 24 x 15 or 16 x 10, 4:5 is 8 x 10, 16:9 is full width, the type tester is 24 x 8.
 import Base from '../../layouts/Base.astro';
 import Media from '../../components/Media.astro';
 import TypeTester from '../../components/TypeTester.astro';
@@ -16,9 +16,15 @@ const next = visible[j];
 
 // Each block becomes its cells on the grid plus where its caption sits.
 let fig = 0;
+let clip = 0;
 const blocks = p.blocks.map((b) => {
   if (b.type === 'text') return { text: b.body };
   fig += 1;
+  if (b.type === 'clip') {
+    const flip = clip % 2 === 1;
+    clip += 1;
+    return { clip: true, flip, title: b.title, body: b.body, media: b.media, stills: b.stills || [] };
+  }
   if (b.type === 'pair' && b.flip) return { fig, caption: b.caption, cap: A(9, 16, 11, 1),
     cells: [{ media: b.b, ratio: 'p', a: A(1, 8, 1, 10) }, { media: b.a, ratio: 'l', a: A(9, 16, 1, 10) }] };
   if (b.type === 'pair') return { fig, caption: b.caption, cap: A(1, 16, 11, 1),
@@ -26,7 +32,7 @@ const blocks = p.blocks.map((b) => {
   if (b.type === 'tester') return { fig, caption: b.caption, cap: A(1, 16, 9, 1), cells: [{ tester: b.text, a: A(1, 24, 1, 8) }] };
   if (b.type === 'embed') return { fig, caption: b.caption, cap: A(17, 8, 1, 1), cells: [{ embed: b.url, a: A(1, 16, 1, 9) }] };
   const ratio = b.ratio || 'l';
-  if (ratio === 'w') return { fig, caption: b.caption, cap: A(17, 8, 1, 1), cells: [{ media: b.media, ratio, a: A(1, 16, 1, 9) }] };
+  if (ratio === 'w') return { fig, caption: b.caption, wide: true, cells: [{ media: b.media, ratio }] };
   if (ratio === 'p') return { fig, caption: b.caption, cap: A(9, 8, 1, 1), cells: [{ media: b.media, ratio, a: A(1, 8, 1, 10) }] };
   return { fig, caption: b.caption, cap: A(1, 16, 16, 1), cells: [{ media: b.media, ratio, a: A(1, 24, 1, 15) }] };
 });
@@ -44,14 +50,38 @@ const blocks = p.blocks.map((b) => {
     </div>
   </section>
 
-  <section class="g24 pj">
-    <div class="cell" style={`--a:${A(1, 24, 1, 15)}`}><Media media={p.cover} ratio="l" /></div>
-  </section>
+  {p.coverRatio === 'w' ? (
+    <section class="pj pj-hero">
+      <Media media={p.cover} ratio="w" />
+    </section>
+  ) : (
+    <section class="g24 pj">
+      <div class="cell" style={`--a:${A(1, 24, 1, 15)}`}><Media media={p.cover} ratio={p.coverRatio || 'l'} /></div>
+    </section>
+  )}
 
   <section class="g24 pj-txt"><p class="pj-lede">{p.intro}</p></section>
 
   {blocks.map((b) => b.text ? (
     <section class="g24 pj-txt"><p class="pj-note">{b.text}</p></section>
+  ) : b.clip ? (
+    <section class:list={['g24', 'pj', 'pj-set', { flip: b.flip }]}>
+      <div class="cell pj-set-head">
+        <p class="bar"><span>{b.title}</span></p>
+        {b.body && <p class="pj-clip-body">{b.body}</p>}
+      </div>
+      <div class="cell pj-set-vid"><Media media={b.media} ratio="w" /></div>
+      {b.stills.length === 2 && (
+        <div class="cell pj-set-thumbs">
+          {b.stills.map((s) => <Media media={s} ratio="w" />)}
+        </div>
+      )}
+    </section>
+  ) : b.wide ? (
+    <figure class="pj pj-hero">
+      <Media media={b.cells[0].media} ratio="w" />
+      {b.caption && <figcaption class="pj-cap"><span class="dim">Fig. {String(b.fig).padStart(2, '0')}</span><span>{b.caption}</span></figcaption>}
+    </figure>
   ) : (
     <figure class="g24 pj">
       {b.cells.map((c) => (
@@ -85,6 +115,16 @@ const blocks = p.blocks.map((b) => {
 <style is:global>
   /* one empty unit between blocks keeps every block on the same lattice */
   .pj,.pj-txt{margin:0 0 calc(var(--u) + 2 * var(--gap));}
+  .g24.pj-set{grid-template-rows:auto;grid-auto-rows:auto;align-items:stretch;}
+  .g24.pj-set > .pj-set-head{grid-area:1 / 1 / auto / span 24;}
+  .g24.pj-set > .pj-set-vid{grid-area:2 / 1 / auto / span 16;}
+  .g24.pj-set > .pj-set-thumbs{grid-area:2 / 17 / auto / span 8;display:flex;flex-direction:column;gap:var(--gap);min-height:0;}
+  .g24.pj-set.flip > .pj-set-vid{grid-area:2 / 9 / auto / span 16;}
+  .g24.pj-set.flip > .pj-set-thumbs{grid-area:2 / 1 / auto / span 8;}
+  .g24.pj-set .pj-set-thumbs .slot.w{flex:1 1 0;min-height:0;min-width:0;height:auto;aspect-ratio:auto;}
+  .pj-clip-body{padding:7px 7px 0;max-width:62ch;}
+  .pj-set-vid .slot.w,.pj-hero .slot.w{aspect-ratio:16/9;height:auto;}
+  .pj-set-vid .slot.w video,.pj-hero .slot.w video{position:static;width:100%;height:auto;inset:auto;object-fit:unset;}
   .pj-txt{grid-auto-rows:auto;}
   .pj-txt p{grid-column:7 / span 12;}
   .pj-lede{font-size:18px;line-height:1.2;letter-spacing:-.015em;font-weight:300;padding:0 7px;max-width:52ch;}
@@ -104,7 +144,8 @@ const blocks = p.blocks.map((b) => {
     .pj .slot.l{aspect-ratio:16/10;} .pj .slot.w{aspect-ratio:16/9;} .pj .slot.p{aspect-ratio:4/5;}
     .pj-embed{aspect-ratio:16/9;height:auto;}
     .pj-cap{align-self:stretch;}
-    .pj-first{order:-1;}
+    .g24.pj-set > .pj-set-thumbs{flex-direction:row;}
+    .g24.pj-set .pj-set-thumbs .slot.w{flex:1 1 0;aspect-ratio:16/9;height:auto;}
     .pj-next{padding-top:32px;}
   }
 </style>
