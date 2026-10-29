@@ -12,7 +12,7 @@ Astro static site, deployed on Vercel. One data file drives every page.
 - `public/media/<slug>/`  your loops and images (keep each MP4 under 4 MB)
 - `public/resume.pdf`     resume
 - `public/wordmark.svg`   "David Lee" set in XR/PROTOCOL, then set `wordmark: '/wordmark.svg'`
-- `public/og.png`         1200x630 share image
+- `public/og.png`         1200x630 share image (then add `<meta property="og:image">` back in `src/layouts/Base.astro`)
 
 ## Swapping a placeholder for real media
 In projects.js change
@@ -22,16 +22,13 @@ to
 The label becomes the alt text.
 
 ## Draft vs live
-- `status: 'draft'` shows in dev and on Vercel previews, never on production.
+- `status: 'draft'` shows in dev and on Vercel previews.
+- Right now `.env.production` sets `PUBLIC_SHOW_DRAFTS=true`, so production shows drafts too.
 - Flip a project to `status: 'live'` only when every placeholder on its page is replaced.
-- Vercel > Project > Settings > Environment Variables:
-  `PUBLIC_SHOW_DRAFTS = true`, scope **Preview only** (not Production).
+- Delete `.env.production` once the projects you want public are live.
 
 ## Deploy
-1. Create a GitHub repo, push this folder.
-2. vercel.com > Add New > Project > import the repo. Framework: Astro (auto). Deploy.
-3. Work on a branch (`git checkout -b build`). Every push gives a preview URL with drafts visible.
-4. Launch: merge to `main`.
+Push to `build` for a preview URL (drafts visible). Merge `build` into `main` for production.
 
 ## Domain (do on launch day, not before)
 1. Vercel > Project > Settings > Domains > add `dxxidlee.com` and `www.dxxidlee.com`.
