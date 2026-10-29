@@ -2,11 +2,9 @@
 export const site = {
   name: '@dxxidlee',
   fullName: 'David (Seungmin) Lee',
-  title: '@dxxidlee',
   description: 'Designer building identity systems, interfaces, and motion, from concept to code.',
   positioning: 'designer building identity systems, interfaces, and motion, from concept to code.',
   status: ['Freelance Designer, McCANN New York', 'BFA in Communication Design, Parsons School of Design'],
-  wordmark: null,              // set to '/wordmark.svg' once you export it from Glyphs
   email: 'dxxidlee@gmail.com',
   resume: '/resume.pdf',       // drop your PDF at public/resume.pdf
   links: [

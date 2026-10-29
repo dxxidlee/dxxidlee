@@ -11,7 +11,6 @@ Astro static site, deployed on Vercel. One data file drives every page.
 - `src/data/projects.js`  every project, its copy, media, and page blocks
 - `public/media/<slug>/`  your loops and images (keep each MP4 under 4 MB)
 - `public/resume.pdf`     resume
-- `public/wordmark.svg`   "David Lee" set in XR/PROTOCOL, then set `wordmark: '/wordmark.svg'`
 - `public/og.png`         1200x630 share image (then add `<meta property="og:image">` back in `src/layouts/Base.astro`)
 
 ## Swapping a placeholder for real media
@@ -22,10 +21,14 @@ to
 The label becomes the alt text.
 
 ## Draft vs live
-- `status: 'draft'` shows in dev and on Vercel previews.
-- Right now `.env.production` sets `PUBLIC_SHOW_DRAFTS=true`, so production shows drafts too.
-- Flip a project to `status: 'live'` only when every placeholder on its page is replaced.
-- Delete `.env.production` once the projects you want public are live.
+- `status: 'live'` shows everywhere. `status: 'draft'` shows in dev and on Vercel previews, never on production.
+- `[Bracketed text]` is a placeholder. It shows in dev and previews and is stripped on production.
+  Put punctuation that belongs to it inside the brackets: `MegaETH[, and Artist].`
+- Media with no file still shows as a grey labeled box on production, so add files before going live.
+- Previews show drafts because Vercel > dxxidlee > Settings > Environment Variables has
+  `PUBLIC_SHOW_DRAFTS = true` scoped to **Preview** only.
+- The homepage Grid mosaic is laid out for exactly 5 projects (`mosaic` in `src/pages/index.astro`).
+  Any other count falls back to equal tiles until you add slots for it.
 
 ## Deploy
 Push to `build` for a preview URL (drafts visible). Merge `build` into `main` for production.
@@ -37,4 +40,5 @@ Push to `build` for a preview URL (drafts visible). Merge `build` into `main` fo
 
 ## Export settings for loops
 H.264 MP4, 1920x1200 (16:10) or 1200x1500 (4:5), 6 to 8 s, no audio, under 4 MB.
+If a loop is still over 4 MB, raise `-crf` to 28. Longer reels can go higher but stay under ~10 MB.
     ffmpeg -i in.mov -an -vf "scale=1920:-2" -c:v libx264 -crf 26 -preset slow -movflags +faststart out.mp4

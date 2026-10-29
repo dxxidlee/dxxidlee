@@ -2,7 +2,10 @@
 //
 // status: 'live'  -> always shown
 //         'draft' -> shown in `npm run dev` and when PUBLIC_SHOW_DRAFTS=true (Vercel previews),
-//                    hidden in the production build. This enforces "no gray box goes live".
+//                    hidden in the production build.
+//
+// [Bracketed text] is a placeholder: shown wherever drafts show, stripped (with the space before it)
+// in production. Put punctuation that belongs to the placeholder inside the brackets.
 //
 // Media: { src: '/media/<slug>/file.mp4', label: 'what goes here' }
 //   no src  -> renders a labeled placeholder of the right ratio
@@ -17,14 +20,15 @@
 //                                                                   mobileFirst: 'b' shows the 4:5 first on phones)
 //   { type: 'tester', text: 'protocol', caption }   (live PROTOCOL type, one line)
 //   { type: 'clip',  title, body, media, stills? }  (16:9 video + stacked stills, sides alternate)
+//   { type: 'embed', url, caption }  (YouTube or Vimeo iframe, for full-length video)
 //   { type: 'text',  body: '...' }
 
-const m = (label, src, extra = {}) => ({ label, src, ...extra });
+const m = (label, src) => ({ label, src });
 
 export const projects = [
   {
     slug: 'i-dentity',
-    status: 'draft',
+    status: 'live',
     title: 'I+DENTITY',
     line: 'A 260-page archive, website, and campaign that treat identity as tradeable data.',
     tags: 'Book, website, campaign',
@@ -44,7 +48,7 @@ export const projects = [
   },
   {
     slug: 'design-tools-at-mccann',
-    status: 'draft',
+    status: 'live',
     title: 'Design Tools at McCANN',
     line: 'Internal tools I design and code for the design team at McCANN New York.',
     tags: 'Desktop app, web tools, scripts',
@@ -64,7 +68,7 @@ export const projects = [
   },
   {
     slug: 'greenwash',
-    status: 'draft',
+    status: 'live',
     title: 'Greenwash',
     line: 'A publication, responsive site, and animated poster set in a New York where collapse is sold as progress.',
     tags: 'Book, website, motion',
@@ -100,9 +104,9 @@ export const projects = [
   },
   {
     slug: 'titles-gfx',
-    status: 'draft',
+    status: 'live',
     title: 'Titles and GFX',
-    line: 'Title cards, credits, and graphics for music videos for Khalid, MegaETH, and [Can\u2019t FW Us artist].',
+    line: 'Title cards, credits, and graphics for music videos for Khalid, MegaETH[, and Can\u2019t FW Us artist].',
     tags: 'Motion, typography',
     year: '2025 to 2026',
     role: 'GFX artist',
@@ -119,7 +123,7 @@ export const projects = [
       { type: 'clip', title: 'Sadder Days', body: 'Billboard.',
         media: m('Sadder Days billboard', '/media/title_gfx/02-sadder-days-billboard.mp4'),
         stills: [m('Sadder Days still 1', '/media/title_gfx/02-sadder-days_still-1.jpg'), m('Sadder Days still 2', '/media/title_gfx/02-sadder-days_still-2.jpg')] },
-      { type: 'clip', title: 'Can\u2019t FW Us', body: '[Artist]. Music video. Shooting, editing, title card, and GFX.',
+      { type: 'clip', title: 'Can\u2019t FW Us', body: '[Artist.] Music video. Shooting, editing, title card, and GFX.',
         media: m('Can\u2019t FW Us', '/media/title_gfx/03-jireh-cant-fw-us.mp4'),
         stills: [m('Can\u2019t FW Us still 1', '/media/title_gfx/03-jireh-cant-fw-us_still-1.jpg'), m('Can\u2019t FW Us still 2', '/media/title_gfx/03-jireh-cant-fw-us_still-2.jpg')] },
       { type: 'clip', title: 'Real Estate', body: 'Visualizer for Thomas Maggart.',
@@ -128,14 +132,14 @@ export const projects = [
       { type: 'clip', title: 'Fugue State', body: 'MegaETH. Music video by Oliver Shore and Kevin Puttkamer. GFX.',
         media: m('Fugue State GFX', '/media/title_gfx/05-fugue-state-gfx.mp4'),
         stills: [m('Fugue State still 1', '/media/title_gfx/05-fugue-state-gfx_still-1.jpg'), m('Fugue State still 2', '/media/title_gfx/05-fugue-state-gfx_still-2.jpg')] },
-      { type: 'clip', title: 'Something Special', body: 'Khalid and Ahn Hyo-seop. Official music video. Title card and credits. Director: [name].',
+      { type: 'clip', title: 'Something Special', body: 'Khalid and Ahn Hyo-seop. Official music video. Title card and credits. [Director: name.]',
         media: m('Something Special type', '/media/title_gfx/06-something-special-type.mp4'),
         stills: [m('Something Special still 1', '/media/title_gfx/06-something-special-type_still-1.jpg'), m('Something Special still 2', '/media/title_gfx/06-something-special-type_still-2.jpg')] },
     ],
   },
   {
     slug: 'protocol',
-    status: 'draft',
+    status: 'live',
     title: 'PROTOCOL / XR',
     line: 'A display typeface written as a rulebook: 26 rules, A to Z.',
     tags: 'Typeface, specimen',
@@ -191,4 +195,9 @@ export const index = [
 ];
 
 export const showDrafts = import.meta.env.DEV || import.meta.env.PUBLIC_SHOW_DRAFTS === 'true';
-export const visible = projects.filter((p) => p.status === 'live' || showDrafts);
+// Production: drop every [placeholder] string, deep, so no bracket reaches the page.
+const scrub = (v) => typeof v === 'string' ? v.replace(/\s*\[[^\]]*\]/g, '').trim()
+  : Array.isArray(v) ? v.map(scrub)
+  : v && typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, scrub(x)]))
+  : v;
+export const visible = projects.filter((p) => p.status === 'live' || showDrafts).map((p) => (showDrafts ? p : scrub(p)));

@@ -3,4 +3,3 @@ dist/
 .astro/
 .vercel/
 .DS_Store
-public/fonts/

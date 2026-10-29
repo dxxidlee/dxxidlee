@@ -28,7 +28,7 @@ export const thumbs = (p) => {
   if (tt) list.splice(1, 1, { tester: tt.text });
   return list.slice(0, 3);
 };
-export const spec = (p) => [['Year', p.year], ['Role', p.role], ['Deliverables', p.tags], ['Tools', p.tools]];
+export const spec = (p) => [['Year', p.year], ['Role', p.role], ['Deliverables', p.tags], ['Tools', p.tools]].filter(([, v]) => v);
 
 const lastYear = (y) => Math.max(0, ...(String(y).match(/\d{4}/g) || []).map(Number));
 export const rows = [

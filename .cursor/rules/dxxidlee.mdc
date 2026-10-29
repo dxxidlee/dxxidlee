@@ -11,7 +11,7 @@ Target roles: product designer (new grad), design engineer, interaction designer
 Live on Vercel (dxxidlee.vercel.app); the dxxidlee.com domain is not connected yet. Ship, then refine.
 
 ## Stack (do not change)
-- Astro 5, static output, deployed on Vercel from GitHub. No backend, no CMS, no UI framework unless asked.
+- Astro 7, static output, deployed on Vercel from GitHub. No backend, no CMS, no UI framework unless asked.
 - Self-hosted fonts via @fontsource or /public/fonts. No external font or script CDNs.
 - Plain CSS in src/styles/global.css (or scoped <style> in components). No Tailwind unless asked.
 
@@ -20,9 +20,9 @@ Live on Vercel (dxxidlee.vercel.app); the dxxidlee.com domain is not connected y
 - ONE project template: src/pages/work/[slug].astro renders every project from its data entry. Never create per-project page files.
 - src/components/Media.astro handles every image and video:
   no src = labeled placeholder at the right ratio; .mp4/.webm/.mov = muted, looped, playsinline video; else = lazy image.
-- Draft gating: projects with status 'draft' render only when showDrafts is true (dev, or PUBLIC_SHOW_DRAFTS=true at build time).
-  Placeholders must never appear in a production build without drafts. Preserve this when refactoring.
-- Block types on project pages: full, pair, embed, text. Add new types in the template and document them at the top of projects.js.
+- Draft gating: projects with status 'draft' render only when showDrafts is true (dev, or PUBLIC_SHOW_DRAFTS=true on Vercel Preview).
+  On production, [bracketed placeholder] text is stripped by `scrub` in projects.js. Preserve this when refactoring.
+- Block types on project pages: full, pair, clip, tester, embed, text. Add new types in the template and document them at the top of projects.js.
 
 ## Media conventions
 - Files at public/media/<slug>/<name>.mp4|.jpg|.webp

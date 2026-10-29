@@ -27,15 +27,15 @@ const sequence = visible.map((p, i) => ({ p, i }));
 sequence.splice(Math.min(2, visible.length), 0, { inter: true });
 
 // Mosaic: grid view tiles in mixed sizes that tile a 24 x 12 unit block with no holes.
-// Set MOSAIC to false to go back to equal tiles. It only switches on when every tile has a slot.
+// It only switches on when every tile has a slot; a different project count falls back to equal tiles.
 const mosaic = {
-  p1: A(1, 10, 1, 8), p5: A(1, 6, 9, 4), p6: A(7, 4, 9, 4),
+  p1: A(1, 10, 1, 8), p4: A(1, 6, 9, 4), p5: A(7, 4, 9, 4),
   p2: A(11, 5, 1, 6), wip1: A(11, 5, 7, 2), wip0: A(11, 5, 9, 4),
-  experience: A(16, 5, 1, 5), p7: A(16, 5, 6, 4), contact: A(16, 5, 10, 3),
-  p3: A(21, 4, 1, 4), p4: A(21, 4, 5, 4), index: A(21, 4, 9, 4),
+  experience: A(16, 5, 1, 8), contact: A(16, 5, 9, 4),
+  p3: A(21, 4, 1, 8), index: A(21, 4, 9, 4),
 };
 const tileKey = (t) => (t.kind === 'project' ? `p${t.n}` : t.kind === 'wip' ? `wip${inProgress.indexOf(t.w)}` : t.kind);
-const MOSAIC = true && gridTiles.length === Object.keys(mosaic).length && gridTiles.every((t) => mosaic[tileKey(t)]);
+const MOSAIC = gridTiles.length === Object.keys(mosaic).length && gridTiles.every((t) => mosaic[tileKey(t)]);
 const tileStyle = (t) => (MOSAIC && mosaic[tileKey(t)] ? `--a:${mosaic[tileKey(t)]}` : undefined);
 ---
 <Base>
