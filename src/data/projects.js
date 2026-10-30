@@ -13,6 +13,8 @@
 //   other   -> image
 //   tile    -> 1:1 (or other) crop used only in the packed desktop Grid mosaic;
 //              cover stays 16:10 / 16:9 for Expanded, the case study, and Grid under 1260px
+//   hero    -> optional sharper copy of the cover for the full-width case study top (2560 wide);
+//              the small cover keeps the homepage light
 //
 // Block types for project pages:
 //   { type: 'full',  ratio: 'l' (16:10) | 'w' (16:9) | 'p' (4:5), media, caption }
@@ -37,13 +39,14 @@ export const projects = [
     tools: '[Tools]',
     live: 'https://alter-net-idsq.vercel.app/',
     cover: m('AlterNet site film', '/media/i-dentity/AlterNet_site_film_16x10.mp4'),
+    hero: m('AlterNet site film', '/media/i-dentity/AlterNet_site_film_16x10_hero.mp4'),
     portrait: m('4:5, book cover or spread'),
     intro: 'Framed as a forensic archive of breaches, synthetic personas, and data markets, I+DENTITY shows how identity systems reduce people to exploitable records, and the gap between lived experience and the data that stands in for it. [One more sentence: what you set out to make, or the key constraint.]',
     blocks: [
       { type: 'full', ratio: 'w', media: m('System overview 16:9: book, site, and campaign in one frame'), caption: 'Book, website, and campaign built from one visual system.' },
-      { type: 'pair', a: m('Book spreads 16:10'), b: m('Book detail 4:5'), caption: '[Caption: what these spreads show.]' },
+      { type: 'pair', a: m('Book spreads 16:10'), b: m('AlterNet on desktop', '/media/i-dentity/AlterNet_mockup_desktop_4x5.mp4'), caption: '[Caption: what these spreads show.]' },
       { type: 'full', ratio: 'l', media: m('I+DENTITY logo construction', '/media/i-dentity/IDENTITY_logo_construction_16x10_4K.mp4'), caption: '[Caption: how the logo is built.]' },
-      { type: 'pair', a: m('Campaign 16:10'), b: m('Campaign poster 4:5'), caption: '[Caption.]' },
+      { type: 'pair', a: m('Campaign 16:10'), b: m('AlterNet on mobile', '/media/i-dentity/AlterNet_mockup_mobile_4x5.mp4'), caption: '[Caption.]' },
     ],
   },
   {

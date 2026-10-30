@@ -52,11 +52,11 @@ const blocks = p.blocks.map((b) => {
 
   {p.coverRatio === 'w' ? (
     <section class="pj pj-hero">
-      <Media media={p.cover} ratio="w" />
+      <Media media={p.hero || p.cover} ratio="w" />
     </section>
   ) : (
     <section class="g24 pj">
-      <div class="cell" style={`--a:${A(1, 24, 1, 15)}`}><Media media={p.cover} ratio={p.coverRatio || 'l'} /></div>
+      <div class="cell" style={`--a:${A(1, 24, 1, 15)}`}><Media media={p.hero || p.cover} ratio={p.coverRatio || 'l'} /></div>
     </section>
   )}
 
