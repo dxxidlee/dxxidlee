@@ -44,7 +44,7 @@ export const projects = [
     intro: 'Framed as a forensic archive of breaches, synthetic personas, and data markets, I+DENTITY shows how identity systems reduce people to exploitable records, and the gap between lived experience and the data that stands in for it. [One more sentence: what you set out to make, or the key constraint.]',
     blocks: [
       { type: 'full', ratio: 'w', media: m('System overview 16:9: book, site, and campaign in one frame'), caption: 'Book, website, and campaign built from one visual system.' },
-      { type: 'pair', a: m('Book spreads 16:10'), b: m('AlterNet on desktop', '/media/i-dentity/AlterNet_mockup_desktop_4x5.mp4'), caption: '[Caption: what these spreads show.]' },
+      { type: 'pair', a: m('AlterNet feature loop', '/media/i-dentity/AlterNet_feature_loop_16x10.mp4'), b: m('AlterNet on desktop', '/media/i-dentity/AlterNet_mockup_desktop_4x5.mp4'), caption: '[Caption: what these spreads show.]' },
       { type: 'full', ratio: 'l', media: m('I+DENTITY logo construction', '/media/i-dentity/IDENTITY_logo_construction_16x10_4K.mp4'), caption: '[Caption: how the logo is built.]' },
       { type: 'pair', a: m('Campaign 16:10'), b: m('AlterNet on mobile', '/media/i-dentity/AlterNet_mockup_mobile_4x5.mp4'), caption: '[Caption.]' },
     ],
