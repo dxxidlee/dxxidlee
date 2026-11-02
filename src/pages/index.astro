@@ -84,7 +84,7 @@ sequence.splice(Math.min(2, visible.length), 0, { inter: true });
             if (t.kind === 'project') return (
               <a class="gt" href={`/work/${t.p.slug}`}>
                 <span class="bar"><span><span class="no">{pad(t.n)}</span>{t.p.title}</span><span>{t.p.year}</span></span>
-                <Media media={t.p.cover} ratio={t.p.coverRatio || 'l'} />
+                <Media media={t.p.cover} ratio="l" />
                 <span class="gt-line">{t.p.line}</span>
               </a>
             );
