@@ -86,7 +86,7 @@ export const projects = [
   },
   {
     slug: 'tnnt-alive',
-    status: 'draft',
+    status: 'live',
     title: 'TNNT Alive',
     line: '[One line: what TNNT Alive is and what it does.]',
     tags: '[Deliverables]',
@@ -158,7 +158,7 @@ export const projects = [
   },
   {
     slug: 'naked',
-    status: 'draft',
+    status: 'live',
     title: 'Naked',
     line: 'A typing questionnaire that turns your pauses into letter spacing.',
     tags: 'Website, interaction',

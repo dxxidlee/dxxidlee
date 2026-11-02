@@ -114,24 +114,6 @@ const blocks = p.blocks.map((b) => {
   )}
 </Base>
 
-<script>
-  // Desktop: the description sits under Details. A short panel never reaches the end of the gallery before the
-  // page runs out of scroll, so over the last half screen the description slides down to end on the last media's edge.
-  const side = document.querySelector('.pj-side');
-  const lede = side.querySelector('.pj-lede');
-  const gal = document.querySelector('.pj-gal:last-of-type');
-  const fit = () => {
-    lede.style.transform = '';
-    if (getComputedStyle(side).position !== 'sticky') return;
-    const left = document.documentElement.scrollHeight - innerHeight - scrollY;
-    const d = gal.getBoundingClientRect().bottom - left - lede.getBoundingClientRect().bottom;
-    if (d > 0) lede.style.transform = `translateY(${d * Math.max(0, 1 - left / (innerHeight / 2))}px)`;
-  };
-  addEventListener('scroll', fit, { passive: true });
-  addEventListener('resize', fit);
-  fit();
-</script>
-
 <style is:global>
   /* every block is one gap from the next, the same gap as between columns and around the page */
   .pj,.pj-txt{margin:0 0 var(--gap);}
@@ -155,12 +137,15 @@ const blocks = p.blocks.map((b) => {
   /* title to cover: the same space as above the title */
   .pj-gal .intro{grid-template-rows:none;grid-auto-rows:auto;padding-top:0;margin-bottom:0;}
   .pj-head{margin-bottom:var(--U);}
-  .pj-side{grid-area:1 / 2 / span 2;position:sticky;top:calc(var(--U) + var(--gap));display:flex;flex-direction:column;gap:var(--gap);}
+  /* The panel fills the screen (same space top and bottom), description at its foot, so at the end of the page
+     the description always lands on the bottom edge of the last image or video. */
+  .pj-side{grid-area:1 / 2 / span 2;position:sticky;top:calc(var(--U) + var(--gap));min-height:calc(100dvh - 2 * (var(--U) + var(--gap)));display:flex;flex-direction:column;gap:var(--gap);}
+  .pj-side .pj-lede{margin-top:auto;}
   @container (max-width:1100px){
     /* Narrow: one column again, details between the title and the cover. */
     .pj-body{display:block;}
     .pj-head{margin-bottom:0;}
-    .pj-side{position:static;margin:14px 0 calc(var(--U) + var(--gap));max-width:calc(12 * var(--U) + 11 * var(--gap));}
+    .pj-side{position:static;min-height:0;margin:14px 0 calc(var(--U) + var(--gap));max-width:calc(12 * var(--U) + 11 * var(--gap));}
   }
   .pj-note{border-top:1px solid var(--ink);padding:5px 7px;}
   .pj-embed{position:relative;height:100%;background:var(--ph);}
