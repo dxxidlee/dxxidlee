@@ -75,7 +75,8 @@ export const projects = [
     role: 'Design, code',
     tools: '[Tools]',
     live: 'https://gw-37.vercel.app/',
-    cover: m('16:10 loop, desktop + mobile side by side'),
+    cover: m('Greenwash film', '/media/greenwash/Greenwash_film_16x10.mp4'),
+    hero: m('Greenwash film', '/media/greenwash/Greenwash_film_16x10_hero.mp4'),
     portrait: m('4:5, animated poster'),
     intro: 'A speculative near-future New York where environmental collapse is masked as progress through state-led green interventions. Greenwash shows how design and policy can make control look good and hide ecological loss. [One more sentence.]',
     blocks: [
