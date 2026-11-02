@@ -1,12 +1,28 @@
 ---
 // Renders a placeholder, a looping video, or an image depending on media.src.
 // Video src gets #t=0.001 so iPhone Safari paints the first frame before it plays.
-const { media, ratio = 'l' } = Astro.props;
+// With alt (a second video), the slot is a button that switches between the two.
+const { media, alt, ratio = 'l' } = Astro.props;
 const src = media?.src;
 const isVideo = src && /\.(mp4|webm|mov)$/i.test(src);
+const Tag = alt ? 'button' : 'div';
 ---
-<div class={`slot ${ratio}`}>
+<Tag class={`slot ${ratio}`} type={alt ? 'button' : undefined} data-swap={alt ? '' : undefined} aria-label={alt ? `Switch to ${alt.label}` : undefined}>
   {!src && <span class="lbl">{media?.label}</span>}
   {isVideo && <video src={`${src}#t=0.001`} muted loop playsinline preload="metadata" data-autoplay aria-label={media.label}></video>}
   {src && !isVideo && <img src={src} alt={media.label} loading="lazy" decoding="async" />}
-</div>
+  {alt && <video src={`${alt.src}#t=0.001`} muted loop playsinline preload="none" data-autoplay aria-label={alt.label} hidden></video>}
+</Tag>
+
+<script>
+  // Hidden videos stop intersecting, so the autoplay observer in Base pauses one and plays the other.
+  document.querySelectorAll<HTMLButtonElement>('[data-swap]').forEach((b) => b.addEventListener('click', () => {
+    const [a, z] = b.querySelectorAll('video');
+    const next = a.hidden ? a : z;
+    const prev = a.hidden ? z : a;
+    prev.hidden = true;
+    next.currentTime = 0;
+    next.hidden = false;
+    b.setAttribute('aria-label', `Switch to ${prev.getAttribute('aria-label')}`);
+  }));
+</script>

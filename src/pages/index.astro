@@ -6,7 +6,7 @@ import Media from '../components/Media.astro';
 import Module from '../components/Module.astro';
 import { site } from '../data/site.js';
 import { visible, inProgress, index, showDrafts } from '../data/projects.js';
-import { pad, pair, A, layouts, rows } from '../lib/work.js';
+import { pad, pair, A, layouts, rows, link } from '../lib/work.js';
 
 const people = [...site.experience, ...site.education];
 const shortDate = (d) => (/present/i.test(d) ? 'Now' : (d.match(/\d{4}/g) || ['']).pop());
@@ -82,9 +82,9 @@ sequence.splice(Math.min(2, visible.length), 0, { inter: true });
         <div class="gt-grid">
           {gridTiles.map((t) => {
             if (t.kind === 'project') return (
-              <a class="gt" href={`/work/${t.p.slug}`}>
+              <a class="gt" {...link(t.p)}>
                 <span class="bar"><span><span class="no">{pad(t.n)}</span>{t.p.title}</span><span>{t.p.year}</span></span>
-                <Media media={t.p.cover} ratio="l" />
+                <Media media={t.p.cover} alt={t.p.cover2} ratio="l" />
                 <span class="gt-line">{t.p.line}</span>
               </a>
             );
@@ -173,7 +173,7 @@ sequence.splice(Math.min(2, visible.length), 0, { inter: true });
   .gt-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px var(--gap);}
   .gt{display:flex;flex-direction:column;gap:var(--gap);min-width:0;}
   a.gt:hover{text-decoration:none;}
-  a.gt:hover .bar{background:var(--ph);}
+  a.gt[href]:hover .bar{background:var(--ph);}
   .gt-body{aspect-ratio:16/10;margin:0;overflow:hidden;}
   .gt-soft{background:var(--pill);display:flex;align-items:flex-end;padding:7px;color:var(--mute);}
   .gt-list{list-style:none;padding:0;}

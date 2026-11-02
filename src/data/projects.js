@@ -11,6 +11,8 @@
 //   no src  -> renders a labeled placeholder of the right ratio
 //   .mp4    -> muted autoplay loop (plays only while on screen)
 //   other   -> image
+//   page    -> false for a project with no case study: its tile and Expanded module link nowhere
+//   cover2  -> optional second cover video; clicking the cover switches between the two
 //   hero    -> optional sharper copy of the cover for the full-width case study top (2560 wide);
 //              the small cover keeps the homepage light
 //
@@ -48,23 +50,17 @@ export const projects = [
     ],
   },
   {
-    slug: 'design-tools-at-mccann',
+    // No case study (client work is under NDA): the tile links nowhere; clicking it switches between the logo film and a cut of the team's work.
+    slug: 'mccann',
     status: 'live',
-    title: 'Design Tools at McCANN',
-    line: 'Internal tools I design and code for the design team at McCANN New York.',
-    tags: 'Desktop app, web tools, scripts',
+    page: false,
+    title: 'McCANN New York',
+    line: 'Campaigns, motion, and internal tools for Design at McCANN New York.',
     year: '2026',
     role: 'Design Intern, then Freelance Designer',
-    tools: '[Tauri, JavaScript, ExtendScript]',
-    live: null,
     cover: m('McCANN Truth Well Told', '/media/mccann/McCANN_TruthWellTold_16x10_1920x1200-hq.mp4'),
-    portrait: m('4:5, tool UI detail'),
-    intro: 'Design Intern from June to August 2026, Freelance Designer since. At McCANN I work on client design and motion, and build tools that speed up the team: a desktop reference board, a lockup generator, and After Effects scripts. Client work is under NDA and available on request.',
-    blocks: [
-      { type: 'full', ratio: 'l', media: m('RefStrip loop 16:10: board fills, palette extracts, card pops out') },
-      { type: 'full', ratio: 'l', media: m('Lockup Tool loop 16:10, dummy wordmark') },
-      { type: 'full', ratio: 'l', media: m('AE text splitter loop 16:10') },
-    ],
+    cover2: m('McCANN New York design team work', '/media/mccann/McCANN_design_team_16x10.mp4'),
+    intro: 'Design Intern from June to August 2026, Freelance Designer since, on client design and motion with the McCANN New York design team. Client work is under NDA; this is a selection, and more is available on request.',
   },
   {
     slug: 'greenwash',

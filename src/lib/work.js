@@ -18,13 +18,15 @@ export const layouts = [
   { info: A(1, 6, 1, 8), port: A(7, 5, 1, 6), cover: A(12, 13, 1, 8), thumbs: [T(12, 9), T(15, 9), T(18, 9)] },
 ];
 
+// A project's case study link; none for a project with page: false.
+export const link = (p) => (p.page === false ? {} : { href: `/work/${p.slug}` });
+
 // Three thumbnails per module; a project's live type tester takes the second one.
 export const thumbs = (p) => {
-  const list = p.blocks
-    .flatMap((b) => (b.type === 'pair' ? [b.a, b.b] : b.media ? [b.media] : []))
+  const list = (p.blocks || []).flatMap((b) => (b.type === 'pair' ? [b.a, b.b] : b.media ? [b.media] : []))
     .filter((m) => !m.src || m.src !== p.portrait?.src)
     .map((media) => ({ media }));
-  const tt = p.blocks.find((b) => b.type === 'tester');
+  const tt = p.blocks?.find((b) => b.type === 'tester');
   if (tt) list.splice(1, 1, { tester: tt.text });
   return list.slice(0, 3);
 };
@@ -32,6 +34,6 @@ export const spec = (p) => [['Year', p.year], ['Role', p.role], ['Deliverables',
 
 const lastYear = (y) => Math.max(0, ...(String(y).match(/\d{4}/g) || []).map(Number));
 export const rows = [
-  ...visible.map((p) => ({ title: p.title, type: p.tags, year: p.year, role: p.role, href: `/work/${p.slug}`, label: 'Case study' })),
+  ...visible.map((p) => ({ title: p.title, type: p.tags, year: p.year, role: p.role, href: link(p).href, label: 'Case study' })),
   ...index.map((r) => ({ title: r.title, type: r.type, year: r.year, role: '', href: r.href, label: r.href ? 'Visit' : '' })),
 ].sort((a, b) => lastYear(b.year) - lastYear(a.year));

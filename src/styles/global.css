@@ -21,6 +21,8 @@ html,a,button,summary{cursor:url('/favicon.svg') 16 16,auto;}
 
 /* media slot */
 .slot{position:relative;background:var(--ph);overflow:hidden;}
+button.slot{display:block;width:100%;padding:0;border:0;font:inherit;cursor:pointer;}
+.slot video[hidden]{display:none;}
 .slot:has(> img){background:var(--bg);} /* grey is only for empty placeholders; transparent PNG/SVG sit on white */
 .slot.l{aspect-ratio:16/10;} .slot.w{aspect-ratio:16/9;} .slot.p{aspect-ratio:4/5;} .slot.s{aspect-ratio:1/1;}
 .slot img,.slot video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;}

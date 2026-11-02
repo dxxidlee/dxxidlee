@@ -3,7 +3,7 @@
 .vw a:hover{text-decoration:underline;text-underline-offset:2px;}
 .vw .bar{display:flex;justify-content:space-between;gap:12px;background:var(--pill);padding:5px 7px;min-width:0;}
 .vw .bar > span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.vw a.bar:hover{background:var(--ph);text-decoration:none;}
+.vw a.bar[href]:hover{background:var(--ph);text-decoration:none;}
 .vw .chip{display:flex;justify-content:space-between;gap:24px;background:var(--ink);color:var(--bg);padding:5px 7px;}
 .vw .dim{color:var(--mute);}
 .vw .no{display:inline-block;min-width:36px;}

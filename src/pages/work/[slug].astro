@@ -8,10 +8,12 @@ import { visible } from '../../data/projects.js';
 import { pad, A, spec } from '../../lib/work.js';
 
 export function getStaticPaths() {
-  return visible.map((p, i) => ({ params: { slug: p.slug }, props: { p, i } }));
+  // Projects with page: false get no page; numbering still counts them.
+  return visible.flatMap((p, i) => (p.page === false ? [] : [{ params: { slug: p.slug }, props: { p, i } }]));
 }
 const { p, i } = Astro.props;
-const j = (i + 1) % visible.length;
+let j = i;
+do j = (j + 1) % visible.length; while (visible[j].page === false);
 const next = visible[j];
 
 // Each block becomes its cells on the grid.
