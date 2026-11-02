@@ -185,7 +185,6 @@ sequence.splice(Math.min(2, visible.length), 0, { inter: true });
   .vw[data-view="grid"] .vx{display:none;}
   .vw[data-view="grid"] .vg{display:block;}
   .vw[data-view="grid"] .i-toc{visibility:hidden;}
-  .gt-grid{grid-template-columns:repeat(6,minmax(0,1fr));}
 
 
   /* everything table */
@@ -198,7 +197,6 @@ sequence.splice(Math.min(2, visible.length), 0, { inter: true });
   .all th:nth-child(4){width:11%;} .all th:nth-child(5){width:20%;}
   .all td:nth-child(1),.all td:nth-child(3),.all td:nth-child(4),.all td:nth-child(5){color:var(--mute);}
 
-  @container (max-width:1270px){ .gt-grid{grid-template-columns:repeat(4,minmax(0,1fr));} }
   @container (max-width:980px){ .gt-grid{grid-template-columns:repeat(3,minmax(0,1fr));} }
 
   @media (max-width:760px){
