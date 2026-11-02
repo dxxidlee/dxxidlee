@@ -4,6 +4,7 @@
 import Base from '../../layouts/Base.astro';
 import Media from '../../components/Media.astro';
 import TypeTester from '../../components/TypeTester.astro';
+import Player from '../../components/Player.astro';
 import { visible } from '../../data/projects.js';
 import { pad, A, spec } from '../../lib/work.js';
 
@@ -23,7 +24,7 @@ const blocks = p.blocks.map((b) => {
   if (b.type === 'clip') {
     const flip = clip % 2 === 1;
     clip += 1;
-    return { clip: true, flip, title: b.title, body: b.body, media: b.media, stills: b.stills || [] };
+    return { clip: true, flip, title: b.title, body: b.body, media: b.media, video: b.video, stills: b.stills || [] };
   }
   if (b.type === 'pair' && b.flip) return { cells: [{ media: b.b, ratio: 'p', a: A(1, 8, 1, 10) }, { media: b.a, ratio: 'l', a: A(9, 16, 1, 10) }] };
   if (b.type === 'pair') return { cells: [{ media: b.a, ratio: 'l', a: A(1, 16, 1, 10) }, { media: b.b, ratio: 'p', a: A(17, 8, 1, 10), first: b.mobileFirst === 'b' }] };
@@ -73,7 +74,7 @@ const blocks = p.blocks.map((b) => {
             <p class="bar"><span>{b.title}</span></p>
             {b.body && <p class="pj-clip-body">{b.body}</p>}
           </div>
-          <div class="cell pj-set-vid"><Media media={b.media} ratio="w" /></div>
+          <div class="cell pj-set-vid">{b.video ? <Player video={b.video} cover={b.media} title={b.title} /> : <Media media={b.media} ratio="w" />}</div>
           {b.stills.length === 2 && (
             <div class="cell pj-set-thumbs">
               {b.stills.map((s) => <Media media={s} ratio="w" />)}

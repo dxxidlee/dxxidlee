@@ -1,0 +1,84 @@
+---
+// A self-hosted film with our own controls (video.small: a lighter file for phones).
+// The cover loop shows until the first play; the film loads only on that click.
+import Media from './Media.astro';
+const { video, cover, title } = Astro.props;
+---
+<div class="pl">
+  <div class="pl-stage">
+    <button type="button" class="pl-cover" aria-label={`Play ${title}`}><Media media={cover} ratio="w" /></button>
+    <video class="pl-film" preload="none" playsinline>
+      {video.small && <source src={video.small} media="(max-width:760px)" type="video/mp4" />}
+      <source src={video.src} type="video/mp4" />
+    </video>
+  </div>
+  <div class="pl-bar">
+    <button type="button" class="bar pl-play"><span>Play</span><span>{title}</span></button>
+    <input type="range" class="pl-seek" min="0" max="1000" value="0" step="1" aria-label="Seek" disabled />
+    <span class="bar pl-time"><span>0:00 / 0:00</span></span>
+    <button type="button" class="bar pl-mute" disabled><span>Mute</span></button>
+    <button type="button" class="bar pl-full"><span>Full screen</span></button>
+  </div>
+</div>
+
+<script>
+  const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+
+  document.querySelectorAll<HTMLElement>('.pl').forEach((el) => {
+    const q = <T extends HTMLElement>(s: string) => el.querySelector<T>(s)!;
+    const vid = q<HTMLVideoElement>('.pl-film'), play = q('.pl-play'), seek = q<HTMLInputElement>('.pl-seek');
+    const time = q('.pl-time'), mute = q<HTMLButtonElement>('.pl-mute'), full = q('.pl-full');
+
+    const tick = () => {
+      const d = vid.duration || 0, t = vid.currentTime;
+      seek.value = String(d ? Math.round((t / d) * 1000) : 0);
+      seek.style.setProperty('--p', `${d ? (t / d) * 100 : 0}%`);
+      time.firstElementChild!.textContent = `${fmt(t)} / ${fmt(d)}`;
+    };
+    const toggle = () => {
+      if (!el.classList.contains('on')) { el.classList.add('on'); seek.disabled = mute.disabled = false; }
+      vid.paused ? vid.play() : vid.pause();
+    };
+
+    // The bar follows the film's own state, so the end of the film updates it too.
+    ['play', 'pause'].forEach((e) => vid.addEventListener(e, () => (play.firstElementChild!.textContent = vid.paused ? 'Play' : 'Pause')));
+    ['timeupdate', 'durationchange', 'seeked'].forEach((e) => vid.addEventListener(e, tick));
+    [play, vid, q('.pl-cover')].forEach((b) => b.addEventListener('click', toggle));
+    seek.addEventListener('input', () => vid.duration && (vid.currentTime = (Number(seek.value) / 1000) * vid.duration));
+    mute.addEventListener('click', () => {
+      vid.muted = !vid.muted;
+      mute.firstElementChild!.textContent = vid.muted ? 'Unmute' : 'Mute';
+    });
+    if (!document.fullscreenEnabled) full.hidden = true;
+    full.addEventListener('click', () => (document.fullscreenElement ? document.exitFullscreen() : el.requestFullscreen()));
+  });
+</script>
+
+<style is:global>
+  .pl{display:flex;flex-direction:column;gap:var(--gap);}
+  .pl-stage{position:relative;aspect-ratio:16/9;background:#000;}
+  .pl-cover{display:block;width:100%;height:100%;padding:0;border:0;cursor:pointer;}
+  .pl-cover .slot.w{height:100%;}
+  .pl-film{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;cursor:pointer;visibility:hidden;}
+  .pl.on .pl-film{visibility:visible;}
+  .pl.on .pl-cover{visibility:hidden;}
+  /* a film narrower or wider than 16:9 sits on the page colour, not black bars */
+  .pl.on .pl-stage{background:var(--bg);}
+  .pl-bar{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr) auto auto auto;gap:var(--gap);}
+  .pl-bar button{font:inherit;color:inherit;border:0;cursor:pointer;text-align:left;}
+  .pl-bar button:disabled{cursor:default;color:var(--mute);}
+  .pl-bar button:not(:disabled):hover{background:var(--ph);}
+  .pl-play span:last-child{color:var(--mute);}
+  .pl-time{font-variant-numeric:tabular-nums;}
+  .pl-seek{-webkit-appearance:none;appearance:none;margin:0;min-width:0;height:auto;cursor:pointer;
+    background:linear-gradient(var(--ink),var(--ink)) 0 0 / var(--p,0%) 100% no-repeat var(--pill);}
+  .pl-seek:disabled{cursor:default;}
+  .pl-seek::-webkit-slider-thumb{-webkit-appearance:none;width:2px;height:24px;background:var(--ink);}
+  .pl-seek::-moz-range-thumb{width:2px;height:24px;border:0;border-radius:0;background:var(--ink);}
+  .pl:fullscreen{background:#000;padding:var(--gap);}
+  .pl:fullscreen .pl-stage{flex:1;aspect-ratio:auto;background:#000;}
+  @media (max-width:760px){
+    .pl-bar{grid-template-columns:auto minmax(0,1fr) auto;}
+    .pl-play span:last-child,.pl-mute,.pl-full{display:none;}
+  }
+</style>

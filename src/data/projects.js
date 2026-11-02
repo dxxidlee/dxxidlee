@@ -21,7 +21,9 @@
 //   { type: 'pair',  a: media (16:10), b: media (4:5) }   (flip: true puts the 4:5 on the left;
 //                                                                   mobileFirst: 'b' shows the 4:5 first on phones)
 //   { type: 'tester', text: 'protocol' }   (live PROTOCOL type, one line)
-//   { type: 'clip',  title, body, media, stills? }  (16:9 video + stacked stills, sides alternate)
+//   { type: 'clip',  title, body, media, stills?, video? }  (16:9 video + stacked stills, sides alternate;
+//                    video: { src, small? } the full film, played there with our own controls, media as the cover;
+//                    small: a lighter file for phones)
 //   { type: 'embed', url }  (YouTube or Vimeo iframe, for full-length video)
 //   { type: 'text',  body: '...' }
 
@@ -115,21 +117,26 @@ export const projects = [
     blocks: [
       { type: 'clip', title: 'Yin and Yang', body: 'Lyric video.',
         media: m('Yin and Yang lyric', '/media/title_gfx/01-yin-and-yang-lyric.mp4'),
+        video: { src: '/media/title_gfx/01-yin-and-yang-1080.mp4', small: '/media/title_gfx/01-yin-and-yang-720.mp4' },
         stills: [m('Yin and Yang still 1', '/media/title_gfx/01-yin-and-yang-lyric_still-1.jpg'), m('Yin and Yang still 2', '/media/title_gfx/01-yin-and-yang-lyric_still-2.jpg')] },
       { type: 'clip', title: 'Sadder Days', body: 'Billboard.',
         media: m('Sadder Days billboard', '/media/title_gfx/02-sadder-days-billboard.mp4'),
         stills: [m('Sadder Days still 1', '/media/title_gfx/02-sadder-days_still-1.jpg'), m('Sadder Days still 2', '/media/title_gfx/02-sadder-days_still-2.jpg')] },
       { type: 'clip', title: 'Can\u2019t FW Us', body: '[Artist.] Music video. Shooting, editing, title card, and GFX.',
         media: m('Can\u2019t FW Us', '/media/title_gfx/03-jireh-cant-fw-us.mp4'),
+        video: { src: '/media/title_gfx/03-cant-fw-us-1080.mp4', small: '/media/title_gfx/03-cant-fw-us-720.mp4' },
         stills: [m('Can\u2019t FW Us still 1', '/media/title_gfx/03-jireh-cant-fw-us_still-1.jpg'), m('Can\u2019t FW Us still 2', '/media/title_gfx/03-jireh-cant-fw-us_still-2.jpg')] },
       { type: 'clip', title: 'Real Estate', body: 'Visualizer for Thomas Maggart.',
         media: m('Real Estate visualizer', '/media/title_gfx/04-real-estate.mp4'),
+        video: { src: '/media/title_gfx/04-real-estate-1080.mp4', small: '/media/title_gfx/04-real-estate-720.mp4' },
         stills: [m('Real Estate still 1', '/media/title_gfx/04-real-estate_still-1.jpg'), m('Real Estate still 2', '/media/title_gfx/04-real-estate_still-2.jpg')] },
       { type: 'clip', title: 'Fugue State', body: 'MegaETH. Music video by Oliver Shore and Kevin Puttkamer. GFX.',
         media: m('Fugue State GFX', '/media/title_gfx/05-fugue-state-gfx.mp4'),
+        video: { src: '/media/title_gfx/05-fugue-state-1080.mp4', small: '/media/title_gfx/05-fugue-state-720.mp4' },
         stills: [m('Fugue State still 1', '/media/title_gfx/05-fugue-state-gfx_still-1.jpg'), m('Fugue State still 2', '/media/title_gfx/05-fugue-state-gfx_still-2.jpg')] },
       { type: 'clip', title: 'Something Special', body: 'Khalid and Ahn Hyo-seop. Official music video. Title card and credits. [Director: name.]',
         media: m('Something Special type', '/media/title_gfx/06-something-special-type.mp4'),
+        video: { src: '/media/title_gfx/06-something-special-1080.mp4', small: '/media/title_gfx/06-something-special-720.mp4' },
         stills: [m('Something Special still 1', '/media/title_gfx/06-something-special-type_still-1.jpg'), m('Something Special still 2', '/media/title_gfx/06-something-special-type_still-2.jpg')] },
     ],
   },
