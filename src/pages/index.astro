@@ -26,17 +26,6 @@ gridTiles.push({ kind: 'contact' }, { kind: 'index' });
 const sequence = visible.map((p, i) => ({ p, i }));
 sequence.splice(Math.min(2, visible.length), 0, { inter: true });
 
-// Mosaic: grid view tiles in mixed sizes that tile a 24 x 12 unit block with no holes.
-// It only switches on when every tile has a slot; a different project count falls back to equal tiles.
-const mosaic = {
-  p1: A(1, 10, 1, 8), p4: A(1, 6, 9, 4), p5: A(7, 4, 9, 4),
-  p2: A(11, 5, 1, 6), wip1: A(11, 5, 7, 2), wip0: A(11, 5, 9, 4),
-  experience: A(16, 5, 1, 8), contact: A(16, 5, 9, 4),
-  p3: A(21, 4, 1, 8), index: A(21, 4, 9, 4),
-};
-const tileKey = (t) => (t.kind === 'project' ? `p${t.n}` : t.kind === 'wip' ? `wip${inProgress.indexOf(t.w)}` : t.kind);
-const MOSAIC = gridTiles.length === Object.keys(mosaic).length && gridTiles.every((t) => mosaic[tileKey(t)]);
-const tileStyle = (t) => (MOSAIC && mosaic[tileKey(t)] ? `--a:${mosaic[tileKey(t)]}` : undefined);
 ---
 <Base>
   <Fragment slot="right">
@@ -90,32 +79,31 @@ const tileStyle = (t) => (MOSAIC && mosaic[tileKey(t)] ? `--a:${mosaic[tileKey(t
       </div>
 
       <div class="vg">
-        <div class={MOSAIC ? "gt-grid mosaic" : "gt-grid"}>
+        <div class="gt-grid">
           {gridTiles.map((t) => {
             if (t.kind === 'project') return (
-              <a class="gt" href={`/work/${t.p.slug}`} style={tileStyle(t)}>
+              <a class="gt" href={`/work/${t.p.slug}`}>
                 <span class="bar"><span><span class="no">{pad(t.n)}</span>{t.p.title}</span><span>{t.p.year}</span></span>
                 <Media media={t.p.cover} ratio={t.p.coverRatio || 'l'} />
-                {t.p.tile && <Media media={t.p.tile} ratio="s" />}
                 <span class="gt-line">{t.p.line}</span>
               </a>
             );
             if (t.kind === 'wip') return (
-              <div class="gt" style={tileStyle(t)}>
+              <div class="gt">
                 <span class="bar"><span>{t.w.title}</span><span class="dim">{t.w.meta}</span></span>
                 {t.w.image && (t.w.image.src || showDrafts) ? <Media media={t.w.image} ratio="l" /> : <span class="gt-body gt-soft"><span>In progress</span></span>}
                 <span class="gt-line">{t.w.line}</span>
               </div>
             );
             if (t.kind === 'experience') return (
-              <div class="gt" style={tileStyle(t)}>
+              <div class="gt">
                 <span class="bar"><span>Experience</span><span>{pad(people.length)}</span></span>
                 <ul class="gt-body gt-list">{people.map((e) => <li><span>{e.org}</span><span class="dim">{shortDate(e.dates)}</span></li>)}</ul>
                 <span class="gt-line"><a href="/info">More on the info page +</a></span>
               </div>
             );
             if (t.kind === 'contact') return (
-              <div class="gt" style={tileStyle(t)}>
+              <div class="gt">
                 <span class="bar"><span>Contact</span><span>{site.location}</span></span>
                 <ul class="gt-body gt-list">
                   <li><a href={`mailto:${site.email}`}>{site.email}</a><span>+</span></li>
@@ -126,7 +114,7 @@ const tileStyle = (t) => (MOSAIC && mosaic[tileKey(t)] ? `--a:${mosaic[tileKey(t
               </div>
             );
             return (
-              <div class="gt" style={tileStyle(t)}>
+              <div class="gt">
                 <span class="bar"><span>Other work</span><span>{pad(index.length)}</span></span>
                 <ul class="gt-body gt-list">{index.slice(0, 7).map((r) => <li><span>{r.href ? <a href={r.href} target="_blank" rel="noopener">{r.title}</a> : r.title}</span><span class="dim">{r.year}</span></li>)}</ul>
                 <span class="gt-line"><a href="#all">Everything, newest first +</a></span>
@@ -193,22 +181,12 @@ const tileStyle = (t) => (MOSAIC && mosaic[tileKey(t)] ? `--a:${mosaic[tileKey(t
   .gt-list li > :first-child{overflow:hidden;text-overflow:ellipsis;}
   .gt-list li > :last-child{flex-shrink:0;}
   .gt-line{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.6em;padding:0 7px;}
-  .gt > .slot.s{display:none;}
 
   .vw[data-view="grid"] .vx{display:none;}
   .vw[data-view="grid"] .vg{display:block;}
   .vw[data-view="grid"] .i-toc{visibility:hidden;}
   .gt-grid{grid-template-columns:repeat(6,minmax(0,1fr));}
 
-  @container (min-width:1260px){
-    .gt-grid.mosaic{--u:calc((100cqw - 23 * var(--gap)) / 24);grid-template-columns:repeat(24,var(--u));grid-auto-rows:var(--u);gap:var(--gap);}
-    .mosaic .gt{grid-area:var(--a);min-height:0;overflow:hidden;}
-    .mosaic .gt > .slot,.mosaic .gt > .gt-body{flex:1 1 0;min-height:0;aspect-ratio:auto;}
-    .mosaic .gt > .slot.w{flex:0 0 auto;aspect-ratio:16/9;height:auto;}
-    .mosaic .gt:has(.slot.w) .gt-line{display:none;}
-    .mosaic .gt:has(.slot.s) > .slot:not(.s){display:none;}
-    .mosaic .gt > .slot.s{display:block;}
-  }
 
   /* everything table */
   .all{scroll-margin-top:48px;}

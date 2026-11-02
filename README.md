@@ -27,8 +27,6 @@ The label becomes the alt text.
 - Media with no file still shows as a grey labeled box on production, so add files before going live.
 - Previews show drafts because Vercel > dxxidlee > Settings > Environment Variables has
   `PUBLIC_SHOW_DRAFTS = true` scoped to **Preview** only.
-- The homepage Grid mosaic is laid out for exactly 5 projects (`mosaic` in `src/pages/index.astro`).
-  Any other count falls back to equal tiles until you add slots for it.
 
 ## Deploy
 Push to `build` for a preview URL (drafts visible). Merge `build` into `main` for production.

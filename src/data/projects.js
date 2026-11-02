@@ -11,18 +11,16 @@
 //   no src  -> renders a labeled placeholder of the right ratio
 //   .mp4    -> muted autoplay loop (plays only while on screen)
 //   other   -> image
-//   tile    -> 1:1 (or other) crop used only in the packed desktop Grid mosaic;
-//              cover stays 16:10 / 16:9 for Expanded, the case study, and Grid under 1260px
 //   hero    -> optional sharper copy of the cover for the full-width case study top (2560 wide);
 //              the small cover keeps the homepage light
 //
 // Block types for project pages:
-//   { type: 'full',  ratio: 'l' (16:10) | 'w' (16:9) | 'p' (4:5), media, caption }
-//   { type: 'pair',  a: media (16:10), b: media (4:5), caption }   (flip: true puts the 4:5 on the left;
+//   { type: 'full',  ratio: 'l' (16:10) | 'w' (16:9) | 'p' (4:5), media }
+//   { type: 'pair',  a: media (16:10), b: media (4:5) }   (flip: true puts the 4:5 on the left;
 //                                                                   mobileFirst: 'b' shows the 4:5 first on phones)
-//   { type: 'tester', text: 'protocol', caption }   (live PROTOCOL type, one line)
+//   { type: 'tester', text: 'protocol' }   (live PROTOCOL type, one line)
 //   { type: 'clip',  title, body, media, stills? }  (16:9 video + stacked stills, sides alternate)
-//   { type: 'embed', url, caption }  (YouTube or Vimeo iframe, for full-length video)
+//   { type: 'embed', url }  (YouTube or Vimeo iframe, for full-length video)
 //   { type: 'text',  body: '...' }
 
 const m = (label, src) => ({ label, src });
@@ -43,10 +41,10 @@ export const projects = [
     portrait: m('4:5, book cover or spread'),
     intro: 'Framed as a forensic archive of breaches, synthetic personas, and data markets, I+DENTITY shows how identity systems reduce people to exploitable records, and the gap between lived experience and the data that stands in for it. [One more sentence: what you set out to make, or the key constraint.]',
     blocks: [
-      { type: 'full', ratio: 'w', media: m('System overview 16:9: book, site, and campaign in one frame'), caption: 'Book, website, and campaign built from one visual system.' },
-      { type: 'pair', a: m('AlterNet feature loop', '/media/i-dentity/AlterNet_feature_loop_16x10.mp4'), b: m('AlterNet on desktop', '/media/i-dentity/AlterNet_mockup_desktop_4x5.mp4'), caption: '[Caption: what these spreads show.]' },
-      { type: 'full', ratio: 'l', media: m('I+DENTITY logo construction', '/media/i-dentity/IDENTITY_logo_construction_16x10_4K.mp4'), caption: '[Caption: how the logo is built.]' },
-      { type: 'pair', a: m('Campaign 16:10'), b: m('AlterNet on mobile', '/media/i-dentity/AlterNet_mockup_mobile_4x5.mp4'), caption: '[Caption.]' },
+      { type: 'full', ratio: 'w', media: m('System overview 16:9: book, site, and campaign in one frame') },
+      { type: 'pair', a: m('AlterNet feature loop', '/media/i-dentity/AlterNet_feature_loop_16x10.mp4'), b: m('AlterNet on desktop', '/media/i-dentity/AlterNet_mockup_desktop_4x5.mp4') },
+      { type: 'full', ratio: 'l', media: m('I+DENTITY logo construction', '/media/i-dentity/IDENTITY_logo_construction_16x10_4K.mp4') },
+      { type: 'pair', a: m('Campaign 16:10'), b: m('AlterNet on mobile', '/media/i-dentity/AlterNet_mockup_mobile_4x5.mp4') },
     ],
   },
   {
@@ -60,13 +58,12 @@ export const projects = [
     tools: '[Tauri, JavaScript, ExtendScript]',
     live: null,
     cover: m('McCANN Truth Well Told', '/media/mccann/McCANN_TruthWellTold_16x10_1920x1200-hq.mp4'),
-    tile: m('McCANN Truth Well Told', '/media/mccann/McCANN_TruthWellTold_1x1_1080x1080.mp4'),
     portrait: m('4:5, tool UI detail'),
     intro: 'Design Intern from June to August 2026, Freelance Designer since. At McCANN I work on client design and motion, and build tools that speed up the team: a desktop reference board, a lockup generator, and After Effects scripts. Client work is under NDA and available on request.',
     blocks: [
-      { type: 'full', ratio: 'l', media: m('RefStrip loop 16:10: board fills, palette extracts, card pops out'), caption: 'RefStrip, a desktop reference board with palette extraction and pop-out cards.' },
-      { type: 'full', ratio: 'l', media: m('Lockup Tool loop 16:10, dummy wordmark'), caption: 'Lockup Tool: outlined SVG and PNG export with calibrated clear space.' },
-      { type: 'full', ratio: 'l', media: m('AE text splitter loop 16:10'), caption: 'After Effects script that splits text into animatable layers while keeping formatting.' },
+      { type: 'full', ratio: 'l', media: m('RefStrip loop 16:10: board fills, palette extracts, card pops out') },
+      { type: 'full', ratio: 'l', media: m('Lockup Tool loop 16:10, dummy wordmark') },
+      { type: 'full', ratio: 'l', media: m('AE text splitter loop 16:10') },
     ],
   },
   {
@@ -83,8 +80,8 @@ export const projects = [
     portrait: m('4:5, animated poster'),
     intro: 'A speculative near-future New York where environmental collapse is masked as progress through state-led green interventions. Greenwash shows how design and policy can make control look good and hide ecological loss. [One more sentence.]',
     blocks: [
-      { type: 'full', ratio: 'l', media: m('Desktop + mobile synced recording 16:10'), caption: 'Responsive site, designed and coded for desktop and mobile.' },
-      { type: 'pair', a: m('Publication spreads 16:10'), b: m('Animated poster loop 4:5'), caption: '[Caption.]' },
+      { type: 'full', ratio: 'l', media: m('Desktop + mobile synced recording 16:10') },
+      { type: 'pair', a: m('Publication spreads 16:10'), b: m('Animated poster loop 4:5') },
     ],
   },
   {
@@ -101,8 +98,8 @@ export const projects = [
     portrait: m('4:5'),
     intro: '[Context: how TNNT Alive grows out of The New New Testament, a 152-page manifesto of ten rules built from found text and images.]',
     blocks: [
-      { type: 'full', ratio: 'w', media: m('Overview 16:9'), caption: '[Caption.]' },
-      { type: 'pair', a: m('Detail 16:10'), b: m('Detail 4:5'), caption: '[Caption.]' },
+      { type: 'full', ratio: 'w', media: m('Overview 16:9') },
+      { type: 'pair', a: m('Detail 16:10'), b: m('Detail 4:5') },
     ],
   },
   {
@@ -154,9 +151,9 @@ export const projects = [
     portrait: m('PROTOCOL / XR mockup', '/media/protocol/protocol_mockup.jpg'),
     intro: 'PROTOCOL grew out of XR, a circular-unit Didone built in Glyphs at Parsons School of Design. Each letter carries one rule of a dystopian bureaucratic rulebook, published as a type specimen.',
     blocks: [
-      { type: 'pair', flip: true, a: m('PROTOCOL / XR full character set', '/media/protocol/glyphs.mp4'), b: m('PROTOCOL / XR mockup', '/media/protocol/protocol_mockup.jpg'), caption: 'Full character set.' },
-      { type: 'pair', mobileFirst: 'b', a: m('PROTOCOL / XR example', '/media/protocol/protocol_example.svg'), b: m('PROTOCOL / XR specimen booklet scan', '/media/protocol/protocol-scan-black-new.jpg'), caption: '[Caption.]' },
-      { type: 'tester', text: 'protocol', caption: 'Live type. Click the line and type.' },
+      { type: 'pair', flip: true, a: m('PROTOCOL / XR full character set', '/media/protocol/glyphs.mp4'), b: m('PROTOCOL / XR mockup', '/media/protocol/protocol_mockup.jpg') },
+      { type: 'pair', mobileFirst: 'b', a: m('PROTOCOL / XR example', '/media/protocol/protocol_example.svg'), b: m('PROTOCOL / XR specimen booklet scan', '/media/protocol/protocol-scan-black-new.jpg') },
+      { type: 'tester', text: 'protocol' },
     ],
   },
   {
@@ -173,8 +170,8 @@ export const projects = [
     portrait: m('4:5, face-mesh frame'),
     intro: 'Naked records the time between keystrokes and renders each pause as space between letters, so hesitation becomes visible. [One sentence on face tracking and depth.]',
     blocks: [
-      { type: 'full', ratio: 'l', media: m('Interaction loop 16:10'), caption: '[Caption.]' },
-      { type: 'pair', a: m('PRD excerpt 16:10'), b: m('Face-mesh detail 4:5'), caption: 'Written as a product requirements doc before building.' },
+      { type: 'full', ratio: 'l', media: m('Interaction loop 16:10') },
+      { type: 'pair', a: m('PRD excerpt 16:10'), b: m('Face-mesh detail 4:5') },
     ],
   },
 ];

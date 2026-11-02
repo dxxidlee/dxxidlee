@@ -14,88 +14,90 @@ const { p, i } = Astro.props;
 const j = (i + 1) % visible.length;
 const next = visible[j];
 
-// Each block becomes its cells on the grid plus where its caption sits.
-let fig = 0;
+// Each block becomes its cells on the grid.
 let clip = 0;
 const blocks = p.blocks.map((b) => {
   if (b.type === 'text') return { text: b.body };
-  fig += 1;
   if (b.type === 'clip') {
     const flip = clip % 2 === 1;
     clip += 1;
     return { clip: true, flip, title: b.title, body: b.body, media: b.media, stills: b.stills || [] };
   }
-  if (b.type === 'pair' && b.flip) return { fig, caption: b.caption, cap: A(9, 16, 11, 1),
-    cells: [{ media: b.b, ratio: 'p', a: A(1, 8, 1, 10) }, { media: b.a, ratio: 'l', a: A(9, 16, 1, 10) }] };
-  if (b.type === 'pair') return { fig, caption: b.caption, cap: A(1, 16, 11, 1),
-    cells: [{ media: b.a, ratio: 'l', a: A(1, 16, 1, 10) }, { media: b.b, ratio: 'p', a: A(17, 8, 1, 10), first: b.mobileFirst === 'b' }] };
-  if (b.type === 'tester') return { fig, caption: b.caption, cap: A(1, 16, 9, 1), cells: [{ tester: b.text, a: A(1, 24, 1, 8) }] };
-  if (b.type === 'embed') return { fig, caption: b.caption, cap: A(17, 8, 1, 1), cells: [{ embed: b.url, a: A(1, 16, 1, 9) }] };
+  if (b.type === 'pair' && b.flip) return { cells: [{ media: b.b, ratio: 'p', a: A(1, 8, 1, 10) }, { media: b.a, ratio: 'l', a: A(9, 16, 1, 10) }] };
+  if (b.type === 'pair') return { cells: [{ media: b.a, ratio: 'l', a: A(1, 16, 1, 10) }, { media: b.b, ratio: 'p', a: A(17, 8, 1, 10), first: b.mobileFirst === 'b' }] };
+  if (b.type === 'tester') return { cells: [{ tester: b.text, a: A(1, 24, 1, 8) }] };
+  if (b.type === 'embed') return { cells: [{ embed: b.url, a: A(1, 16, 1, 9) }] };
   const ratio = b.ratio || 'l';
-  if (ratio === 'w') return { fig, caption: b.caption, wide: true, cells: [{ media: b.media, ratio }] };
-  if (ratio === 'p') return { fig, caption: b.caption, cap: A(9, 8, 1, 1), cells: [{ media: b.media, ratio, a: A(1, 8, 1, 10) }] };
-  return { fig, caption: b.caption, cap: A(1, 16, 16, 1), cells: [{ media: b.media, ratio, a: A(1, 24, 1, 15) }] };
+  if (ratio === 'w') return { wide: true, cells: [{ media: b.media, ratio }] };
+  if (ratio === 'p') return { cells: [{ media: b.media, ratio, a: A(1, 8, 1, 10) }] };
+  return { cells: [{ media: b.media, ratio, a: A(1, 24, 1, 15) }] };
 });
 ---
 <Base description={p.line} nav="work">
-  <section class="g24 intro">
-    <div class="cell i-text" style={`--a:${A(1, 16, 1, 4)}`}>
-      <p class="bar"><span><span class="no">{pad(i + 1)}</span>Case study</span><span>{p.tags}</span></p>
-      <h1><span class="nm">{p.title}</span> {p.line}</h1>
+  <!-- Desktop: the gallery scrolls on the left, the description and details stay pinned on the right. -->
+  <div class="pj-body">
+    <div class="pj-gal pj-head">
+      <section class="g24 intro">
+        <div class="cell i-text" style={`--a:${A(1, 24, 1, 4)}`}>
+          <p class="bar"><span><span class="no">{pad(i + 1)}</span>Case study</span><span>{p.tags}</span></p>
+          <h1><span class="nm">{p.title}</span> {p.line}</h1>
+        </div>
+      </section>
     </div>
-    <div class="cell i-side" style={`--a:${A(19, 6, 1, 4)}`}>
+
+    <aside class="pj-side">
       <p class="bar"><span>Details</span><span>{pad(i + 1)} / {pad(visible.length)}</span></p>
       <dl class="kv">{spec(p).map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
       {p.live && <a class="bar go" href={p.live} target="_blank" rel="noopener"><span>Visit live site</span><span>+</span></a>}
-    </div>
-  </section>
+      <p class="pj-lede">{p.intro}</p>
+    </aside>
 
-  {p.coverRatio === 'w' ? (
-    <section class="pj pj-hero">
-      <Media media={p.hero || p.cover} ratio="w" />
-    </section>
-  ) : (
-    <section class="g24 pj">
-      <div class="cell" style={`--a:${A(1, 24, 1, 15)}`}><Media media={p.hero || p.cover} ratio={p.coverRatio || 'l'} /></div>
-    </section>
-  )}
-
-  <section class="g24 pj-txt"><p class="pj-lede">{p.intro}</p></section>
-
-  {blocks.map((b) => b.text ? (
-    <section class="g24 pj-txt"><p class="pj-note">{b.text}</p></section>
-  ) : b.clip ? (
-    <section class:list={['g24', 'pj', 'pj-set', { flip: b.flip }]}>
-      <div class="cell pj-set-head">
-        <p class="bar"><span>{b.title}</span></p>
-        {b.body && <p class="pj-clip-body">{b.body}</p>}
-      </div>
-      <div class="cell pj-set-vid"><Media media={b.media} ratio="w" /></div>
-      {b.stills.length === 2 && (
-        <div class="cell pj-set-thumbs">
-          {b.stills.map((s) => <Media media={s} ratio="w" />)}
-        </div>
+    <div class="pj-gal">
+      {p.coverRatio === 'w' ? (
+        <section class="pj pj-hero">
+          <Media media={p.hero || p.cover} ratio="w" />
+        </section>
+      ) : (
+        <section class="g24 pj">
+          <div class="cell" style={`--a:${A(1, 24, 1, 15)}`}><Media media={p.hero || p.cover} ratio={p.coverRatio || 'l'} /></div>
+        </section>
       )}
-    </section>
-  ) : b.wide ? (
-    <figure class="pj pj-hero">
-      <Media media={b.cells[0].media} ratio="w" />
-      {b.caption && <figcaption class="pj-cap"><span class="dim">Fig. {String(b.fig).padStart(2, '0')}</span><span>{b.caption}</span></figcaption>}
-    </figure>
-  ) : (
-    <figure class="g24 pj">
-      {b.cells.map((c) => (
-        <div class:list={['cell', { 'pj-first': c.first }]} style={`--a:${c.a}`}>
-          {c.tester !== undefined
-            ? <TypeTester text={c.tester} />
-            : c.embed
-            ? <div class="pj-embed"><iframe src={c.embed} title={p.title} loading="lazy" allowfullscreen></iframe></div>
-            : <Media media={c.media} ratio={c.ratio} />}
-        </div>
+
+      {blocks.map((b) => b.text ? (
+        <section class="g24 pj-txt"><p class="pj-note">{b.text}</p></section>
+      ) : b.clip ? (
+        <section class:list={['g24', 'pj', 'pj-set', { flip: b.flip }]}>
+          <div class="cell pj-set-head">
+            <p class="bar"><span>{b.title}</span></p>
+            {b.body && <p class="pj-clip-body">{b.body}</p>}
+          </div>
+          <div class="cell pj-set-vid"><Media media={b.media} ratio="w" /></div>
+          {b.stills.length === 2 && (
+            <div class="cell pj-set-thumbs">
+              {b.stills.map((s) => <Media media={s} ratio="w" />)}
+            </div>
+          )}
+        </section>
+      ) : b.wide ? (
+        <figure class="pj pj-hero">
+          <Media media={b.cells[0].media} ratio="w" />
+        </figure>
+      ) : (
+        <figure class="g24 pj">
+          {b.cells.map((c) => (
+            <div class:list={['cell', { 'pj-first': c.first }]} style={`--a:${c.a}`}>
+              {c.tester !== undefined
+                ? <TypeTester text={c.tester} />
+                : c.embed
+                ? <div class="pj-embed"><iframe src={c.embed} title={p.title} loading="lazy" allowfullscreen></iframe></div>
+                : <Media media={c.media} ratio={c.ratio} />}
+            </div>
+          ))}
+        </figure>
       ))}
-      {b.caption && <figcaption class="cell pj-cap" style={`--a:${b.cap}`}><span class="dim">Fig. {String(b.fig).padStart(2, '0')}</span><span>{b.caption}</span></figcaption>}
-    </figure>
-  ))}
+    </div>
+
+  </div>
 
   {next.slug !== p.slug && (
     <section class="g24 intro pj-next">
@@ -112,9 +114,28 @@ const blocks = p.blocks.map((b) => {
   )}
 </Base>
 
+<script>
+  // Desktop: the description sits under Details. A short panel never reaches the end of the gallery before the
+  // page runs out of scroll, so over the last half screen the description slides down to end on the last media's edge.
+  const side = document.querySelector('.pj-side');
+  const lede = side.querySelector('.pj-lede');
+  const gal = document.querySelector('.pj-gal:last-of-type');
+  const fit = () => {
+    lede.style.transform = '';
+    if (getComputedStyle(side).position !== 'sticky') return;
+    const left = document.documentElement.scrollHeight - innerHeight - scrollY;
+    const d = gal.getBoundingClientRect().bottom - left - lede.getBoundingClientRect().bottom;
+    if (d > 0) lede.style.transform = `translateY(${d * Math.max(0, 1 - left / (innerHeight / 2))}px)`;
+  };
+  addEventListener('scroll', fit, { passive: true });
+  addEventListener('resize', fit);
+  fit();
+</script>
+
 <style is:global>
-  /* one empty unit between blocks keeps every block on the same lattice */
-  .pj,.pj-txt{margin:0 0 calc(var(--u) + 2 * var(--gap));}
+  /* every block is one gap from the next, the same gap as between columns and around the page */
+  .pj,.pj-txt{margin:0 0 var(--gap);}
+  .pj-gal > :last-child{margin-bottom:0;}
   .g24.pj-set{grid-template-rows:auto;grid-auto-rows:auto;align-items:stretch;}
   .g24.pj-set > .pj-set-head{grid-area:1 / 1 / auto / span 24;}
   .g24.pj-set > .pj-set-vid{grid-area:2 / 1 / auto / span 16;}
@@ -127,23 +148,34 @@ const blocks = p.blocks.map((b) => {
   .pj-set-vid .slot.w video,.pj-hero .slot.w video{position:static;width:100%;height:auto;inset:auto;object-fit:unset;}
   .pj-txt{grid-auto-rows:auto;}
   .pj-txt p{grid-column:7 / span 12;}
-  .pj-lede{font-size:18px;line-height:1.2;letter-spacing:-.015em;font-weight:300;padding:0 7px;max-width:52ch;}
+  .pj-lede{font-size:18px;line-height:1.2;letter-spacing:-.015em;font-weight:300;padding:14px 7px 0;max-width:52ch;}
+  /* --U is the page unit; the gallery is 18 of them, the pinned side panel 6. Inside the gallery the 24-unit grid scales down. */
+  .pj-body{--U:calc((100cqw - 23 * var(--gap)) / 24);display:grid;grid-template-columns:1fr calc(6 * var(--U) + 5 * var(--gap));gap:var(--gap);align-items:start;padding-top:calc(var(--U) + var(--gap));margin-bottom:var(--U);}
+  .pj-gal{grid-column:1;container-type:inline-size;min-width:0;}
+  /* title to cover: the same space as above the title */
+  .pj-gal .intro{grid-template-rows:none;grid-auto-rows:auto;padding-top:0;margin-bottom:0;}
+  .pj-head{margin-bottom:var(--U);}
+  .pj-side{grid-area:1 / 2 / span 2;position:sticky;top:calc(var(--U) + var(--gap));display:flex;flex-direction:column;gap:var(--gap);}
+  @container (max-width:1100px){
+    /* Narrow: one column again, details between the title and the cover. */
+    .pj-body{display:block;}
+    .pj-head{margin-bottom:0;}
+    .pj-side{position:static;margin:14px 0 calc(var(--U) + var(--gap));max-width:calc(12 * var(--U) + 11 * var(--gap));}
+  }
   .pj-note{border-top:1px solid var(--ink);padding:5px 7px;}
-  .pj-cap{display:grid;grid-template-columns:48px 1fr;gap:10px;align-self:start;border-top:1px solid var(--ink);padding:5px 7px;}
   .pj-embed{position:relative;height:100%;background:var(--ph);}
   .pj-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
-  .pj-next{border-top:1px solid var(--ink);}
   .pj-next a.i-text:hover{text-decoration:none;}
   .pj-next a.i-text:hover .bar{background:var(--ph);}
   .pj-next a.i-text:hover .nm{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.08em;}
   @container (max-width:980px){ .pj-txt p{grid-column:4 / span 18;} }
 
   @media (max-width:760px){
-    .pj,.pj-txt{margin-bottom:32px;}
     .pj .cell .slot{height:auto;}
     .pj .slot.l{aspect-ratio:16/10;} .pj .slot.w{aspect-ratio:16/9;} .pj .slot.p{aspect-ratio:4/5;}
     .pj-embed{aspect-ratio:16/9;height:auto;}
-    .pj-cap{align-self:stretch;}
+    .pj-body{padding-top:48px;}
+    .pj-side{max-width:none;margin:16px 0 32px;}
     .g24.pj-set > .pj-set-thumbs{flex-direction:row;}
     .g24.pj-set .pj-set-thumbs .slot.w{flex:1 1 0;aspect-ratio:16/9;height:auto;}
     .pj-next{padding-top:32px;}
