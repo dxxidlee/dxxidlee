@@ -21,8 +21,8 @@
 //   { type: 'pair',  a: media (16:10), b: media (4:5) }   (flip: true puts the 4:5 on the left;
 //                                                                   mobileFirst: 'b' shows the 4:5 first on phones)
 //   { type: 'tester', text: 'protocol' }   (live PROTOCOL type, one line)
-//   { type: 'clip',  title, body, media, stills?, side?, video? }  (16:9 video + two stacked 16:9 stills, or side:
-//                    one 4:5 image or loop in their place; sides alternate;
+//   { type: 'clip',  title, body, media, side?, video? }  (16:9 video + side: a 4:5 image or loop next to it;
+//                    sides alternate;
 //                    video: { src, small? } the full film, played there with our own controls, media as the cover;
 //                    small: a lighter file for phones)
 //   { type: 'embed', url }  (YouTube or Vimeo iframe, for full-length video)
@@ -132,7 +132,7 @@ export const projects = [
       { type: 'clip', title: 'Fugue State', body: 'MegaETH. Music video by Oliver Shore and Kevin Puttkamer. GFX.',
         media: m('Fugue State GFX', '/media/title_gfx/05-fugue-state-gfx.mp4'),
         video: { src: '/media/title_gfx/05-fugue-state-1080.mp4', small: '/media/title_gfx/05-fugue-state-720.mp4' },
-        stills: [m('Fugue State still 1', '/media/title_gfx/05-fugue-state-gfx_still-1.jpg'), m('Fugue State still 2', '/media/title_gfx/05-fugue-state-gfx_still-2.jpg')] },
+        side: m('Fugue State title card', '/media/title_gfx/05-fugue-state-poster.jpg') },
       { type: 'clip', title: 'Something Special', body: 'Khalid and Ahn Hyo-seop. Official music video. Title card and credits. [Director: name.]',
         media: m('Something Special type', '/media/title_gfx/06-something-special-type.mp4'),
         video: { src: '/media/title_gfx/06-something-special-1080.mp4', small: '/media/title_gfx/06-something-special-720.mp4' },

@@ -24,7 +24,7 @@ const blocks = p.blocks.map((b) => {
   if (b.type === 'clip') {
     const flip = clip % 2 === 1;
     clip += 1;
-    return { clip: true, flip, title: b.title, body: b.body, media: b.media, video: b.video, side: b.side, stills: b.stills || [] };
+    return { clip: true, flip, title: b.title, body: b.body, media: b.media, video: b.video, side: b.side };
   }
   if (b.type === 'pair' && b.flip) return { cells: [{ media: b.b, ratio: 'p', a: A(1, 8, 1, 10) }, { media: b.a, ratio: 'l', a: A(9, 16, 1, 10) }] };
   if (b.type === 'pair') return { cells: [{ media: b.a, ratio: 'l', a: A(1, 16, 1, 10) }, { media: b.b, ratio: 'p', a: A(17, 8, 1, 10), first: b.mobileFirst === 'b' }] };
@@ -75,13 +75,7 @@ const blocks = p.blocks.map((b) => {
             {b.body && <p class="pj-clip-body">{b.body}</p>}
           </div>
           <div class="cell pj-set-vid">{b.video ? <Player video={b.video} cover={b.media} title={b.title} /> : <Media media={b.media} ratio="w" />}</div>
-          {b.side ? (
-            <div class="cell pj-set-thumbs"><Media media={b.side} ratio="p" /></div>
-          ) : b.stills.length === 2 && (
-            <div class="cell pj-set-thumbs">
-              {b.stills.map((s) => <Media media={s} ratio="w" />)}
-            </div>
-          )}
+          {b.side && <div class="cell pj-set-side"><Media media={b.side} ratio="p" /></div>}
         </section>
       ) : b.wide ? (
         <figure class="pj pj-hero">
@@ -126,10 +120,10 @@ const blocks = p.blocks.map((b) => {
   .g24.pj-set{grid-template-rows:auto;grid-auto-rows:auto;align-items:stretch;}
   .g24.pj-set > .pj-set-head{grid-area:1 / 1 / auto / span 24;}
   .g24.pj-set > .pj-set-vid{grid-area:2 / 1 / auto / span 16;}
-  .g24.pj-set > .pj-set-thumbs{grid-area:2 / 17 / auto / span 8;display:flex;flex-direction:column;gap:var(--gap);min-height:0;}
+  .g24.pj-set > .pj-set-side{grid-area:2 / 17 / auto / span 8;display:flex;min-height:0;}
   .g24.pj-set.flip > .pj-set-vid{grid-area:2 / 9 / auto / span 16;}
-  .g24.pj-set.flip > .pj-set-thumbs{grid-area:2 / 1 / auto / span 8;}
-  .g24.pj-set .pj-set-thumbs .slot{flex:1 1 0;min-height:0;min-width:0;height:auto;aspect-ratio:auto;}
+  .g24.pj-set.flip > .pj-set-side{grid-area:2 / 1 / auto / span 8;}
+  .g24.pj-set .pj-set-side .slot{flex:1 1 0;min-height:0;min-width:0;height:auto;aspect-ratio:auto;}
   .pj-clip-body{padding:7px 7px 0;max-width:62ch;}
   .pj-set-vid .slot.w,.pj-hero .slot.w{aspect-ratio:16/9;height:auto;}
   .pj-set-vid .slot.w video,.pj-hero .slot.w video{position:static;width:100%;height:auto;inset:auto;object-fit:unset;}
@@ -166,9 +160,7 @@ const blocks = p.blocks.map((b) => {
     .pj-embed{aspect-ratio:16/9;height:auto;}
     .pj-body{padding-top:48px;}
     .pj-side{max-width:none;margin:16px 0 32px;}
-    .g24.pj-set > .pj-set-thumbs{flex-direction:row;}
-    .g24.pj-set .pj-set-thumbs .slot.w{flex:1 1 0;aspect-ratio:16/9;height:auto;}
-    .g24.pj-set .pj-set-thumbs .slot.p{aspect-ratio:4/5;}
+    .g24.pj-set .pj-set-side .slot{aspect-ratio:4/5;}
     .pj-next{padding-top:32px;}
   }
 </style>
