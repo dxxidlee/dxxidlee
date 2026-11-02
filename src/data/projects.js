@@ -128,7 +128,7 @@ export const projects = [
       { type: 'clip', title: 'Real Estate', body: 'Visualizer for Thomas Maggart.',
         media: m('Real Estate visualizer', '/media/title_gfx/04-real-estate.mp4'),
         video: { src: '/media/title_gfx/04-real-estate-1080.mp4', small: '/media/title_gfx/04-real-estate-720.mp4' },
-        stills: [m('Real Estate still 1', '/media/title_gfx/04-real-estate_still-1.jpg'), m('Real Estate still 2', '/media/title_gfx/04-real-estate_still-2.jpg')] },
+        side: m('Real Estate title card', '/media/title_gfx/04-real-estate-poster.jpg') },
       { type: 'clip', title: 'Fugue State', body: 'MegaETH. Music video by Oliver Shore and Kevin Puttkamer. GFX.',
         media: m('Fugue State GFX', '/media/title_gfx/05-fugue-state-gfx.mp4'),
         video: { src: '/media/title_gfx/05-fugue-state-1080.mp4', small: '/media/title_gfx/05-fugue-state-720.mp4' },
