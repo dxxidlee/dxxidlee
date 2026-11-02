@@ -1,10 +1,10 @@
 ---
-// A self-hosted film with our own controls (video.small: a lighter file for phones).
-// The cover loop shows until the first play; the film loads only on that click.
+// A self-hosted film with our own controls (video.small: a lighter file for phones; video.strip: 12 frames in a row,
+// used as the seek bar). The cover loop shows until the first play; the film loads only then.
 import Media from './Media.astro';
 const { video, cover, title } = Astro.props;
 ---
-<div class="pl">
+<div class="pl" style={video.strip && `--strip:url(${video.strip})`}>
   <div class="pl-stage">
     <button type="button" class="pl-cover" aria-label={`Play ${title}`}><Media media={cover} ratio="w" /></button>
     <video class="pl-film" preload="none" playsinline>
@@ -12,12 +12,14 @@ const { video, cover, title } = Astro.props;
       <source src={video.src} type="video/mp4" />
     </video>
   </div>
+  <div class="pl-strip">
+    <input type="range" class="pl-seek" min="0" max="1000" value="0" step="1" aria-label={`Seek ${title}`} />
+    <span class="pl-head"><svg viewBox="0 0 23 12" width="23" height="12" aria-hidden="true"><path d="M1 6 8 1v10zm21 0-7-5v10z" /></svg></span>
+  </div>
   <div class="pl-bar">
     <button type="button" class="bar pl-play"><span>Play</span><span>{title}</span></button>
-    <input type="range" class="pl-seek" min="0" max="1000" value="0" step="1" aria-label="Seek" disabled />
     <span class="bar pl-time"><span>0:00 / 0:00</span></span>
     <button type="button" class="bar pl-mute" disabled><span>Mute</span></button>
-    <button type="button" class="bar pl-full"><span>Full screen</span></button>
   </div>
 </div>
 
@@ -27,30 +29,38 @@ const { video, cover, title } = Astro.props;
   document.querySelectorAll<HTMLElement>('.pl').forEach((el) => {
     const q = <T extends HTMLElement>(s: string) => el.querySelector<T>(s)!;
     const vid = q<HTMLVideoElement>('.pl-film'), play = q('.pl-play'), seek = q<HTMLInputElement>('.pl-seek');
-    const time = q('.pl-time'), mute = q<HTMLButtonElement>('.pl-mute'), full = q('.pl-full');
+    const time = q('.pl-time'), mute = q<HTMLButtonElement>('.pl-mute');
 
     const tick = () => {
       const d = vid.duration || 0, t = vid.currentTime;
       seek.value = String(d ? Math.round((t / d) * 1000) : 0);
-      seek.style.setProperty('--p', `${d ? (t / d) * 100 : 0}%`);
+      el.style.setProperty('--f', String(d ? t / d : 0));
       time.firstElementChild!.textContent = `${fmt(t)} / ${fmt(d)}`;
     };
-    const toggle = () => {
-      if (!el.classList.contains('on')) { el.classList.add('on'); seek.disabled = mute.disabled = false; }
-      vid.paused ? vid.play() : vid.pause();
+    const start = () => {
+      if (el.classList.contains('on')) return;
+      el.classList.add('on');
+      mute.disabled = false;
     };
+    const toggle = () => { start(); vid.paused ? vid.play() : vid.pause(); };
 
     // The bar follows the film's own state, so the end of the film updates it too.
     ['play', 'pause'].forEach((e) => vid.addEventListener(e, () => (play.firstElementChild!.textContent = vid.paused ? 'Play' : 'Pause')));
     ['timeupdate', 'durationchange', 'seeked'].forEach((e) => vid.addEventListener(e, tick));
     [play, vid, q('.pl-cover')].forEach((b) => b.addEventListener('click', toggle));
-    seek.addEventListener('input', () => vid.duration && (vid.currentTime = (Number(seek.value) / 1000) * vid.duration));
+    // Clicking the strip before the film has loaded starts it at that point.
+    seek.addEventListener('input', () => {
+      const f = Number(seek.value) / 1000;
+      el.style.setProperty('--f', String(f));
+      if (vid.duration) return void (vid.currentTime = f * vid.duration);
+      vid.addEventListener('loadedmetadata', () => (vid.currentTime = f * vid.duration), { once: true });
+      start();
+      vid.play();
+    });
     mute.addEventListener('click', () => {
       vid.muted = !vid.muted;
       mute.firstElementChild!.textContent = vid.muted ? 'Unmute' : 'Mute';
     });
-    if (!document.fullscreenEnabled) full.hidden = true;
-    full.addEventListener('click', () => (document.fullscreenElement ? document.exitFullscreen() : el.requestFullscreen()));
   });
 </script>
 
@@ -64,21 +74,24 @@ const { video, cover, title } = Astro.props;
   .pl.on .pl-cover{visibility:hidden;}
   /* a film narrower or wider than 16:9 sits on the page colour, not black bars */
   .pl.on .pl-stage{background:var(--bg);}
-  .pl-bar{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr) auto auto auto;gap:var(--gap);}
+  /* the seek bar: 12 frames of 16:9, so 12 * 16 / 9 = 64 / 3. What is still to play shows at 10%.
+     The playhead (a bar between two arrows, 23px) stays inside the strip, so it travels 100% - 23px; --f is 0 to 1. */
+  .pl-strip{position:relative;aspect-ratio:64/3;background:var(--strip,var(--pill)) 0 0 / 100% 100% no-repeat var(--pill);}
+  .pl.on .pl-strip::after{content:"";position:absolute;inset:0 0 0 calc(var(--f,0) * (100% - 23px) + 11.5px);background:color-mix(in srgb,var(--bg) 90%,transparent);pointer-events:none;}
+  /* a black bar and two black triangles, each with a 1px white outline so it reads on dark and light frames */
+  .pl-head{position:absolute;top:0;bottom:0;left:calc(var(--f,0) * (100% - 23px));width:23px;pointer-events:none;z-index:1;}
+  .pl-head::before{content:"";position:absolute;top:0;bottom:0;left:10px;width:3px;background:var(--ink);box-shadow:0 0 0 1px var(--bg);}
+  .pl-head svg{position:absolute;left:0;top:50%;margin-top:-6px;overflow:visible;fill:var(--ink);stroke:var(--bg);stroke-width:2;paint-order:stroke;}
+  .pl-seek{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer;}
+  .pl-strip:has(.pl-seek:focus-visible){outline:2px solid var(--ink);outline-offset:2px;}
+  .pl-bar{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:var(--gap);}
   .pl-bar button{font:inherit;color:inherit;border:0;cursor:pointer;text-align:left;}
   .pl-bar button:disabled{cursor:default;color:var(--mute);}
   .pl-bar button:not(:disabled):hover{background:var(--ph);}
   .pl-play span:last-child{color:var(--mute);}
   .pl-time{font-variant-numeric:tabular-nums;}
-  .pl-seek{-webkit-appearance:none;appearance:none;margin:0;min-width:0;height:auto;cursor:pointer;
-    background:linear-gradient(var(--ink),var(--ink)) 0 0 / var(--p,0%) 100% no-repeat var(--pill);}
-  .pl-seek:disabled{cursor:default;}
-  .pl-seek::-webkit-slider-thumb{-webkit-appearance:none;width:2px;height:24px;background:var(--ink);}
-  .pl-seek::-moz-range-thumb{width:2px;height:24px;border:0;border-radius:0;background:var(--ink);}
-  .pl:fullscreen{background:#000;padding:var(--gap);}
-  .pl:fullscreen .pl-stage{flex:1;aspect-ratio:auto;background:#000;}
   @media (max-width:760px){
-    .pl-bar{grid-template-columns:auto minmax(0,1fr) auto;}
-    .pl-play span:last-child,.pl-mute,.pl-full{display:none;}
+    .pl-bar{grid-template-columns:minmax(0,1fr) auto;}
+    .pl-bar .pl-mute,.pl-play span:last-child{display:none;}
   }
 </style>

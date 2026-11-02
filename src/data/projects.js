@@ -24,7 +24,7 @@
 //   { type: 'clip',  title, body, media, side?, video? }  (16:9 video + side: a 4:5 image or loop next to it;
 //                    sides alternate;
 //                    video: { src, small? } the full film, played there with our own controls, media as the cover;
-//                    small: a lighter file for phones)
+//                    small: a lighter file for phones; strip: 12 frames in a row, the seek bar)
 //   { type: 'embed', url }  (YouTube or Vimeo iframe, for full-length video)
 //   { type: 'text',  body: '...' }
 
@@ -119,23 +119,23 @@ export const projects = [
     blocks: [
       { type: 'clip', title: 'Yin and Yang', body: 'Lyric video and billboard.',
         media: m('Yin and Yang lyric', '/media/title_gfx/01-yin-and-yang-lyric.mp4'),
-        video: { src: '/media/title_gfx/01-yin-and-yang-1080.mp4', small: '/media/title_gfx/01-yin-and-yang-720.mp4' },
+        video: { src: '/media/title_gfx/01-yin-and-yang-1080.mp4', small: '/media/title_gfx/01-yin-and-yang-720.mp4', strip: '/media/title_gfx/01-yin-and-yang-strip.jpg' },
         side: m('Yin and Yang mobile', '/media/title_gfx/01-yin-and-yang-mobile.mp4') },
       { type: 'clip', title: 'Can\u2019t FW Us', body: '[Artist.] Music video. Shooting, editing, title card, and GFX.',
         media: m('Can\u2019t FW Us', '/media/title_gfx/03-jireh-cant-fw-us.mp4'),
-        video: { src: '/media/title_gfx/03-cant-fw-us-1080.mp4', small: '/media/title_gfx/03-cant-fw-us-720.mp4' },
+        video: { src: '/media/title_gfx/03-cant-fw-us-1080.mp4', small: '/media/title_gfx/03-cant-fw-us-720.mp4', strip: '/media/title_gfx/03-cant-fw-us-strip.jpg' },
         side: m('Can\u2019t FW Us title card', '/media/title_gfx/03-cant-fw-us-poster.jpg') },
       { type: 'clip', title: 'Real Estate', body: 'Visualizer for Thomas Maggart.',
         media: m('Real Estate visualizer', '/media/title_gfx/04-real-estate.mp4'),
-        video: { src: '/media/title_gfx/04-real-estate-1080.mp4', small: '/media/title_gfx/04-real-estate-720.mp4' },
+        video: { src: '/media/title_gfx/04-real-estate-1080.mp4', small: '/media/title_gfx/04-real-estate-720.mp4', strip: '/media/title_gfx/04-real-estate-strip.jpg' },
         side: m('Real Estate title card', '/media/title_gfx/04-real-estate-poster.jpg') },
       { type: 'clip', title: 'Fugue State', body: 'MegaETH. Music video by Oliver Shore and Kevin Puttkamer. GFX.',
         media: m('Fugue State GFX', '/media/title_gfx/05-fugue-state-gfx.mp4'),
-        video: { src: '/media/title_gfx/05-fugue-state-1080.mp4', small: '/media/title_gfx/05-fugue-state-720.mp4' },
+        video: { src: '/media/title_gfx/05-fugue-state-1080.mp4', small: '/media/title_gfx/05-fugue-state-720.mp4', strip: '/media/title_gfx/05-fugue-state-strip.jpg' },
         side: m('Fugue State title card', '/media/title_gfx/05-fugue-state-poster.jpg') },
       { type: 'clip', title: 'Something Special', body: 'Khalid and Ahn Hyo-seop. Official music video. Title card and credits. [Director: name.]',
         media: m('Something Special type', '/media/title_gfx/06-something-special-type.mp4'),
-        video: { src: '/media/title_gfx/06-something-special-1080.mp4', small: '/media/title_gfx/06-something-special-720.mp4' },
+        video: { src: '/media/title_gfx/06-something-special-1080.mp4', small: '/media/title_gfx/06-something-special-720.mp4', strip: '/media/title_gfx/06-something-special-strip.jpg' },
         side: m('Something Special title card', '/media/title_gfx/06-something-special-poster.jpg') },
     ],
   },
